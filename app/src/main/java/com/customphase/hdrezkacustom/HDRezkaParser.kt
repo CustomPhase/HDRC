@@ -55,7 +55,7 @@ class HDRezkaParser {
 
     suspend fun warmup() {
         val url = "https://rezka.ag/"
-        println(makeRequest(url))
+        makeRequest(url)
     }
 
     suspend fun search(query: String): List<SearchResult> {
