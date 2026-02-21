@@ -13,10 +13,18 @@
         android:orientation="vertical">
 
         <SearchView
+            android:id="@+id/searchView"
             style="@style/SearchBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:queryHint="Поиск..." />
+            android:queryHint="Поиск..." >
+
+        </SearchView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
         <LinearLayout
             style="@style/ContentView"
@@ -35,6 +43,7 @@
                 android:id="@+id/view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
         </LinearLayout>
 
     </LinearLayout>
