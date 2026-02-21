@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="TestStyle" parent="Widget.AppCompat.SearchView">
-        <item name="android:maxHeight">60dp</item>
-        <item name="android:defaultHeight">60dp</item>
-        <item name="android:minHeight">60dp</item>
-        <item name="android:height">60dp</item>
+        <item name="android:maxHeight">50dp</item>
+        <item name="android:defaultHeight">50dp</item>
+        <item name="android:minHeight">50dp</item>
+        <item name="android:height">50dp</item>
         <item name="android:background">@color/searchBackground</item>
 
         <!-- главное: указываем стиль для поля ввода -->
