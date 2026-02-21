@@ -31,6 +31,11 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        lifecycleScope.launch(Dispatchers.IO) {
+            // Здесь выполняется сетевой запрос в фоновом потоке
+            parser.warmup()
+        }
+
         searchView = findViewById(R.id.searchView)
         recyclerView = findViewById(R.id.recyclerView)
 
