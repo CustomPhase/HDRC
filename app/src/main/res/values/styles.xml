@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="TestStyle" parent="Widget.AppCompat.SearchView">
+    <style name="SearchBar" parent="Widget.AppCompat.SearchView">
         <item name="android:maxHeight">50dp</item>
         <item name="android:defaultHeight">50dp</item>
         <item name="android:minHeight">50dp</item>
         <item name="android:height">50dp</item>
         <item name="android:background">@color/searchBackground</item>
+        <item name="cornerRadius">9dp</item>
 
         <!-- главное: указываем стиль для поля ввода -->
         <item name="android:searchViewStyle">@style/SearchViewEditTextStyle</item>
@@ -17,10 +18,11 @@
     </style>
 
     <style name="ContentView">
-        <item name="android:padding">9dp</item>
+        <item name="android:padding">10dp</item>
     </style>
 
     <style name="ContentViewHeader">
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 </resources>

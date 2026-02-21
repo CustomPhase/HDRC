@@ -5,8 +5,8 @@
         android:fontWeight="400"
         android:font="@font/scada_regular" />
 	<font
-        android:fontStyle="bold"
-        android:fontWeight="800"
+        android:fontStyle="normal"
+        android:fontWeight="700"
         android:font="@font/scada_bold" />
     <font
         android:fontStyle="italic"
