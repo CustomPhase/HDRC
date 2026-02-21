@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="SearchBar" parent="Widget.AppCompat.SearchView">
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:maxHeight">50dp</item>
         <item name="android:defaultHeight">50dp</item>
         <item name="android:minHeight">50dp</item>
@@ -24,5 +25,28 @@
     <style name="ContentViewHeader">
         <item name="android:textSize">22sp</item>
         <item name="android:textStyle">bold</item>
+    </style>
+    
+    <style name="SearchResultsContainer">
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="SearchResultItem">
+        <item name="android:padding">6dp</item>
+        <item name="android:maxHeight">60dp</item>
+        <item name="android:height">60dp</item>
+        <item name="android:minHeight">60dp</item>
+    </style>
+
+    <style name="SearchResultItemImage">
+        <item name="android:layout_width">60dp</item>
+        <item name="android:layout_weight">0</item>
+    </style>
+
+    <style name="SearchResultItemTitle">
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textAlignment">gravity</item>
+        <item name="android:layout_gravity">center_vertical</item>
     </style>
 </resources>

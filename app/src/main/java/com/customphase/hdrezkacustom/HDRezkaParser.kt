@@ -58,7 +58,6 @@ class HDRezkaParser {
         println(makeRequest(url))
     }
 
-    // Функция поиска, вызывать в корутине (Dispatchers.IO)
     suspend fun search(query: String): List<SearchResult> {
         val results = mutableListOf<SearchResult>()
 
@@ -76,11 +75,8 @@ class HDRezkaParser {
         val doc: Document = Jsoup.parse(html)
         // Селекторы могут меняться, проверьте на сайте!
         val items = doc.select("div.b-content__inline_item")
-        println(items.count())
+
         for (item in items) {
-
-            println(item)
-
             val linkDiv = item.selectFirst("div.b-content__inline_item-link")
             val coverDiv = item.selectFirst("div.b-content__inline_item-cover")
 

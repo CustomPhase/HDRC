@@ -32,9 +32,9 @@ class SearchAdapter(private val onItemClick: (SearchResult) -> Unit) :
     class SearchViewHolder(itemView: View, private val onItemClick: (SearchResult) -> Unit) :
         RecyclerView.ViewHolder(itemView) {
 
-        private val title: TextView = itemView.findViewById(R.id.titleTextView)
+        private val title: TextView = itemView.findViewById(R.id.searchResultItemTitle)
         //private val description: TextView = itemView.findViewById(R.id.descriptionTextView)
-        private val poster: ImageView = itemView.findViewById(R.id.posterImageView)
+        private val image: ImageView = itemView.findViewById(R.id.searchResultItemImage)
 
         init {
             itemView.setOnClickListener {
@@ -55,7 +55,7 @@ class SearchAdapter(private val onItemClick: (SearchResult) -> Unit) :
                 // Например:
                 // Glide.with(itemView.context).load(result.posterUrl).into(poster)
             } else {
-                poster.setImageResource(android.R.drawable.ic_menu_report_image)
+                image.setImageResource(android.R.drawable.ic_menu_report_image)
             }
 
             itemView.setOnClickListener {
