@@ -1,6 +1,7 @@
 package com.customphase.hdrezkacustom
 
 import android.os.Bundle
+import android.view.View
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -29,6 +30,14 @@ class MainActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        window.decorView.viewTreeObserver.addOnGlobalFocusChangeListener { oldFocus, newFocus ->
+            var oldName = "none"
+            var newName = "none"
+            if (oldFocus != null && oldFocus.id >= 0) oldName = resources.getResourceEntryName(oldFocus.id)
+            if (newFocus != null && newFocus.id >= 0) newName = resources.getResourceEntryName(newFocus.id)
+            println("FOCUS_CHANGE: Focus moved from $oldName to $newName")
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
@@ -71,6 +80,7 @@ class MainActivity : AppCompatActivity() {
             val results = parser.search(query)
             withContext(Dispatchers.Main) {
                 adapter.submitList(results)
+                recyclerView.visibility = if (results.isEmpty()) View.GONE else View.VISIBLE
             }
         }
     }
