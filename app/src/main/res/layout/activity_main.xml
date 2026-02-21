@@ -24,7 +24,8 @@
             android:id="@+id/recyclerView"
             style="@style/SearchResultsContainer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:focusable="false" />
 
         <LinearLayout
             style="@style/ContentView"

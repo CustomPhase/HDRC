@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.core.view.isVisible
+import androidx.activity.OnBackPressedCallback
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,6 +41,17 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (recyclerView.isVisible) {
+                    recyclerView.visibility = View.GONE
+                    searchView.setQuery("", false)
+                } else {
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        })
 
         window.decorView.viewTreeObserver.addOnGlobalFocusChangeListener { oldFocus, newFocus ->
             var oldName = "none"
@@ -68,15 +81,7 @@ class MainActivity : AppCompatActivity() {
         // Обработка поиска
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                if (!query.isNullOrBlank()) {
-                    performSearch(query)
-                    recyclerView.postDelayed({
-                        val firstItem = recyclerView.getChildAt(0)
-                        println(firstItem)
-                        firstItem?.requestFocus()
-                    }, 200)
-                }
-                //hideKeyboard(searchView)
+                searchView.clearFocus()
                 return true
             }
 

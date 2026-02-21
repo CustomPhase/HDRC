@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	style="@style/SearchResultItem"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:orientation="horizontal"
-	android:focusable="true">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/SearchResultItem"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/search_item_background"
+    android:focusable="true"
+    android:orientation="horizontal">
 
-	<ImageView
-		android:id="@+id/searchResultItemImage"
-		style="@style/SearchResultItemImage"
-		android:layout_height="match_parent"
-		android:layout_weight="0"
-		android:scaleType="fitXY"
-		app:srcCompat="@android:drawable/ic_menu_help" />
+    <ImageView
+        android:id="@+id/searchResultItemImage"
+        style="@style/SearchResultItemImage"
+        android:layout_height="match_parent"
+        android:layout_weight="0"
+        android:scaleType="fitXY"
+        app:srcCompat="@android:drawable/ic_menu_help" />
 
-	<TextView
-		android:id="@+id/searchResultItemTitle"
-		style="@style/SearchResultItemTitle"
-		android:layout_width="0dp"
-		android:layout_height="match_parent"
-		android:layout_weight="1"
-		android:text="Test" />
+    <TextView
+        android:id="@+id/searchResultItemTitle"
+        style="@style/SearchResultItemTitle"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="Test" />
 
 </LinearLayout>
