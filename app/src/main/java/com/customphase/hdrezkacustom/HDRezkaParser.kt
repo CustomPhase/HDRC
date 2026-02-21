@@ -83,18 +83,20 @@ class HDRezkaParser {
             var title = "!!! PARSER BROKE !!!"
             var itemUrl = ""
             var poster = ""
-            var description = ""
+            var info = ""
 
             if (linkDiv != null) {
                 val linkElement = linkDiv.selectFirst("a")
                 if (linkElement != null) title = linkElement.text()
+                val infoElement = linkDiv.select("div")[1]
+                if (infoElement != null) info = infoElement.text()
             }
 
             if (coverDiv != null) {
                 val coverElement = coverDiv.selectFirst("img")
                 if (coverElement != null) poster = coverElement.attr("src")
             }
-            results.add(SearchResult(title, itemUrl, poster, description))
+            results.add(SearchResult(title, itemUrl, poster, info))
         }
 
         return results

@@ -4,5 +4,5 @@ data class SearchResult(
     val title: String,
     val url: String,
     val posterUrl: String?,
-    val description: String?
+    val info: String?
 )

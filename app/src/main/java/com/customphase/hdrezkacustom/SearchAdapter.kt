@@ -32,9 +32,10 @@ class SearchAdapter(private val onItemClick: (SearchResult) -> Unit) :
     class SearchViewHolder(itemView: View, private val onItemClick: (SearchResult) -> Unit) :
         RecyclerView.ViewHolder(itemView) {
 
+        private val image: ImageView = itemView.findViewById(R.id.searchResultItemImage)
         private val title: TextView = itemView.findViewById(R.id.searchResultItemTitle)
         //private val description: TextView = itemView.findViewById(R.id.descriptionTextView)
-        private val image: ImageView = itemView.findViewById(R.id.searchResultItemImage)
+        private val info: TextView = itemView.findViewById(R.id.searchResultItemInfo)
 
         init {
             itemView.setOnClickListener {
@@ -47,6 +48,7 @@ class SearchAdapter(private val onItemClick: (SearchResult) -> Unit) :
 
         fun bind(result: SearchResult) {
             title.text = result.title
+            info.text = result.info
             //description.text = result.description ?: "Описание отсутствует"
 
             // Загрузка постера (пока без Glide, можно просто показать заглушку)
