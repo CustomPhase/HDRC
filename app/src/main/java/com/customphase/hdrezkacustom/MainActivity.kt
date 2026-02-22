@@ -109,9 +109,5 @@ class MainActivity : AppCompatActivity() {
         transaction.commit()
         targetPanel.onEnable()
         currentPanel = targetPanel
-
-        if (panelClass == PanelFragmentSearch::class.java) {
-            targetPanel.view?.findViewById<SearchView>(R.id.searchView)?.requestFocus()
-        }
     }
 }
