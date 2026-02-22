@@ -1,5 +1,6 @@
 package com.customphase.hdrezkacustom
 
+import android.content.Context
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
@@ -14,7 +15,7 @@ import javax.net.ssl.TrustManager
 import java.security.cert.X509Certificate
 import javax.net.ssl.*
 
-class HDRezkaParser {
+class HDRezkaParser(val context: Context) {
 
     private val cookieJar = object : CookieJar {
         private val cookieStore = mutableMapOf<String, List<Cookie>>()
@@ -54,7 +55,7 @@ class HDRezkaParser {
     private val client = unsafeOkHttpClient.newBuilder().cookieJar(cookieJar).build()
 
     suspend fun warmup() {
-        val url = "https://rezka.ag/"
+        val url = context.getString(R.string.site_url)
         makeRequest(url)
     }
 
@@ -64,7 +65,7 @@ class HDRezkaParser {
         // Кодируем запрос для URL
         val encodedQuery = java.net.URLEncoder.encode(query, "utf-8")
         // Используйте актуальное зеркало rezka
-        val url = "https://rezka.ag/search/?do=search&subaction=search&q=$encodedQuery"
+        val url = "${context.getString(R.string.site_url)}/search/?do=search&subaction=search&q=$encodedQuery"
         println(url)
         val html = makeRequest(url)
         if (html == null) {

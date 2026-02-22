@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">HDRezka Custom</string>
     <string name="view_history">История просмотра:</string>
+    <string name="site_url">https://rezka.ag</string>
 </resources>

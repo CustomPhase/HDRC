@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchView: SearchView
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: SearchAdapter
-    private val parser = HDRezkaParser()
+    private val parser by lazy { HDRezkaParser(this) }
 
     private fun hideKeyboard(view: View) {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
