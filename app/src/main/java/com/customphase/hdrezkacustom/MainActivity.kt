@@ -105,8 +105,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun switchToPanel(panelClass: Class<out PanelFragment>, addToHistory: Boolean) {
-        if (addToHistory && currentPanel != null)
+        if (addToHistory && currentPanel != null) {
+            if (panelHistory.count() > 16) panelHistory.removeLast()
             panelHistory.push(currentPanel!!::class.java)
+        }
 
         val targetPanel = panels[panelClass] ?: return
         if (targetPanel == currentPanel) return
