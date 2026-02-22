@@ -3,7 +3,6 @@ package com.customphase.hdrezkacustom
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.SearchView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -79,10 +78,10 @@ class MainActivity : AppCompatActivity() {
         }
         transaction.commit()
 
-        createPanelsNavigation()
+        initializePanelsNavigation()
     }
 
-    private fun createPanelsNavigation() {
+    private fun initializePanelsNavigation() {
         val navigationContainer = findViewById<LinearLayout>(R.id.navigation_container)
         panels.forEach { (panelClass, fragment) ->
             val panel = fragment as PanelFragment

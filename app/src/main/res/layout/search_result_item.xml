@@ -31,7 +31,9 @@
             android:layout_weight="0.8"
             android:gravity="bottom"
             android:paddingTop="6dp"
-            android:text="Title" />
+            android:text="Title"
+            android:textColor="@color/main_text"
+            android:textColorHint="@color/main_hint_text" />
 
         <TextView
             android:id="@+id/searchResultItemInfo"
