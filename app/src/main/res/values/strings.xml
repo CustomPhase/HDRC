@@ -3,4 +3,5 @@
     <string name="view_history">История просмотра:</string>
     <string name="settings">Настройки:</string>
     <string name="site_url">https://rezka.ag</string>
+    <string name="exit_confirm">Нажмите еще раз чтобы выйти</string>
 </resources>

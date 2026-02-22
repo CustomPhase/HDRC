@@ -7,7 +7,7 @@ import android.view.ViewGroup
 
 class PanelFragmentHistory : PanelFragment() {
     override val iconResource: Int
-        get() = R.drawable.ic_history
+        get() = R.drawable.icon_history
     override val title: String
         get() = "История"
 

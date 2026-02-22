@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 
 class PanelFragmentSearch : PanelFragment() {
     override val iconResource: Int
-        get() = R.drawable.ic_search
+        get() = R.drawable.icon_search
     override val title: String
         get() = "Поиск"
 

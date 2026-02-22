@@ -16,11 +16,12 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
-    internal val panels = mutableMapOf<Class<out PanelFragment>, PanelFragment>()
-    internal var currentPanel: PanelFragment? = null
-    internal val defaultPanel = PanelFragmentHistory::class.java
-    internal var backPressedTime: Long = 0
-    internal var exitInterval = 2000.0
+    private val panels = mutableMapOf<Class<out PanelFragment>, PanelFragment>()
+    private val panelHistory = java.util.ArrayDeque<Class<out PanelFragment>>()
+    private var currentPanel: PanelFragment? = null
+    private val defaultPanel = PanelFragmentHistory::class.java
+    private var backPressedTime: Long = 0
+    private var exitInterval = 2000.0
 
     val parser by lazy { HDRezkaParser(this) }
 
@@ -34,16 +35,19 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        // Register the OnBackPressedCallback
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (System.currentTimeMillis() - backPressedTime < exitInterval) {
-                    // Exit the app on the second back press within the interval
-                    finish()
+                if (panelHistory.count() > 1) {
+                    switchToPanel(panelHistory.pop())
                 } else {
-                    // Show a toast message on the first back press
-                    Toast.makeText(this@MainActivity, "Нажмите еще раз чтобы выйти", Toast.LENGTH_SHORT).show()
-                    backPressedTime = System.currentTimeMillis()
+                    if (System.currentTimeMillis() - backPressedTime < exitInterval) {
+                        // Exit the app on the second back press within the interval
+                        finish()
+                    } else {
+                        // Show a toast message on the first back press
+                        Toast.makeText(this@MainActivity, getString(R.string.exit_confirm), Toast.LENGTH_SHORT).show()
+                        backPressedTime = System.currentTimeMillis()
+                    }
                 }
             }
         })
@@ -101,6 +105,7 @@ class MainActivity : AppCompatActivity() {
         val targetPanel = panels[panelClass] ?: return
         if (targetPanel == currentPanel) return
 
+        panelHistory.add(panelClass)
         val transaction = supportFragmentManager.beginTransaction()
         currentPanel?.onDisable()
         currentPanel?.let { transaction.hide(it)}

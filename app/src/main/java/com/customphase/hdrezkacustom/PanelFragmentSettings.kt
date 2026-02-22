@@ -7,7 +7,7 @@ import android.view.ViewGroup
 
 class PanelFragmentSettings : PanelFragment() {
     override val iconResource: Int
-        get() = R.drawable.ic_settings
+        get() = R.drawable.icon_settings
     override val title: String
         get() = "Настройки"
 
