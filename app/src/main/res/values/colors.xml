@@ -2,8 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="searchBackground">#FFA754</color>
-    <color name="searchText">#C8BBB1</color>
+    <color name="main">#FF973A</color>
+    <color name="main_background">#CEC5BE</color>
     <color name="searchItemBackgroundNormal">#C8BBB1</color>
     <color name="searchItemBackgroundFocused">#F8E1D4</color>
 </resources>

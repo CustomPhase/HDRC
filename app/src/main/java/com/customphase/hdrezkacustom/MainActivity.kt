@@ -1,35 +1,29 @@
 package com.customphase.hdrezkacustom
 
-import android.content.Context
 import android.os.Bundle
-import android.view.View
-import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.SearchView
+import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import androidx.core.view.isVisible
-import androidx.activity.OnBackPressedCallback
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var searchView: SearchView
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: SearchAdapter
-    private val parser by lazy { HDRezkaParser(this) }
+    internal val panels = mutableMapOf<Class<out PanelFragment>, PanelFragment>()
+    internal var currentPanel: PanelFragment? = null
+    internal val defaultPanel = PanelFragmentHistory::class.java
+    internal var backPressedTime: Long = 0
+    internal var exitInterval = 2000.0
 
-    private fun hideKeyboard(view: View) {
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
-        view.clearFocus() // Optional: Also clear focus from the SearchView
-    }
+    val parser by lazy { HDRezkaParser(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,17 +35,30 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        // Register the OnBackPressedCallback
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (recyclerView.isVisible) {
-                    recyclerView.visibility = View.GONE
-                    searchView.setQuery("", false)
+                if (System.currentTimeMillis() - backPressedTime < exitInterval) {
+                    // Exit the app on the second back press within the interval
+                    finish()
                 } else {
-                    onBackPressedDispatcher.onBackPressed()
+                    // Show a toast message on the first back press
+                    Toast.makeText(this@MainActivity, "Нажмите еще раз чтобы выйти", Toast.LENGTH_SHORT).show()
+                    backPressedTime = System.currentTimeMillis()
                 }
             }
         })
 
+        lifecycleScope.launch(Dispatchers.IO) {
+            parser.warmup()
+        }
+
+        initializeFocusDebug()
+        initializePanels()
+        switchToPanel(defaultPanel)
+    }
+
+    private fun initializeFocusDebug() {
         window.decorView.viewTreeObserver.addOnGlobalFocusChangeListener { oldFocus, newFocus ->
             var oldName = "none"
             var newName = "none"
@@ -59,47 +66,52 @@ class MainActivity : AppCompatActivity() {
             if (newFocus != null && newFocus.id >= 0) newName = resources.getResourceEntryName(newFocus.id)
             println("FOCUS_CHANGE: Focus moved from $oldName to $newName")
         }
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            // Здесь выполняется сетевой запрос в фоновом потоке
-            parser.warmup()
-        }
-
-        searchView = findViewById(R.id.searchView)
-        recyclerView = findViewById(R.id.searchRecyclerView)
-
-        // Настройка RecyclerView
-        adapter = SearchAdapter { searchResult ->
-            lifecycleScope.launch(Dispatchers.IO) {
-                parser.getItemCard(searchResult.url)
-            }
-        }
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
-
-        // Обработка поиска
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                searchView.clearFocus()
-                return true
-            }
-
-            override fun onQueryTextChange(query: String?): Boolean {
-                if (!query.isNullOrBlank()) {
-                    performSearch(query)
-                }
-                return false
-            }
-        })
     }
 
-    private fun performSearch(query: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val results = parser.search(query)
-            withContext(Dispatchers.Main) {
-                adapter.submitList(results)
-                recyclerView.visibility = if (results.isEmpty()) View.GONE else View.VISIBLE
+    private fun initializePanels() {
+        panels[PanelFragmentHistory::class.java] = PanelFragmentHistory()
+        panels[PanelFragmentSearch::class.java] = PanelFragmentSearch()
+        panels[PanelFragmentSettings::class.java] = PanelFragmentSettings()
+
+        val transaction = supportFragmentManager.beginTransaction()
+        for (panel in panels.values) {
+            transaction.add(R.id.panel_container, panel).hide(panel)
+        }
+        transaction.commit()
+
+        createPanelsNavigation()
+    }
+
+    private fun createPanelsNavigation() {
+        val navigationContainer = findViewById<LinearLayout>(R.id.navigation_container)
+        panels.forEach { (panelClass, fragment) ->
+            val panel = fragment as PanelFragment
+            val itemView = layoutInflater.inflate(R.layout.navigation_button, navigationContainer, false)
+            val icon = itemView.findViewById<ImageView>(R.id.nav_icon)
+            val text = itemView.findViewById<TextView>(R.id.nav_title)
+            icon.setImageResource(panel.iconResource)
+            text.text = panel.title
+            itemView.setOnClickListener {
+                switchToPanel(panelClass)
             }
+            navigationContainer.addView(itemView)
+        }
+    }
+
+    private fun switchToPanel(panelClass: Class<out PanelFragment>) {
+        val targetPanel = panels[panelClass] ?: return
+        if (targetPanel == currentPanel) return
+
+        val transaction = supportFragmentManager.beginTransaction()
+        currentPanel?.onDisable()
+        currentPanel?.let { transaction.hide(it)}
+        transaction.show(targetPanel)
+        transaction.commit()
+        targetPanel.onEnable()
+        currentPanel = targetPanel
+
+        if (panelClass == PanelFragmentSearch::class.java) {
+            targetPanel.view?.findViewById<SearchView>(R.id.searchView)?.requestFocus()
         }
     }
 }

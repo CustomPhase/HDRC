@@ -2,19 +2,19 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/SearchResultItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/search_item_background"
     android:focusable="true"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:padding="8dp">
 
     <ImageView
         android:id="@+id/searchResultItemImage"
-        style="@style/SearchResultItemImage"
+        android:layout_width="60dp"
         android:layout_height="match_parent"
         android:layout_weight="0"
-        android:scaleType="fitXY"
+        android:scaleType="fitCenter"
         app:srcCompat="@android:drawable/ic_menu_help" />
 
     <LinearLayout
@@ -26,21 +26,23 @@
 
         <TextView
             android:id="@+id/searchResultItemTitle"
-            style="@style/SearchResultItemTitle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="0.8"
             android:gravity="bottom"
-            android:text="Test" />
+            android:paddingTop="6dp"
+            android:text="Title" />
 
         <TextView
             android:id="@+id/searchResultItemInfo"
-            style="@style/SearchResultItemInfo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="top"
-            android:text="TextView" />
+            android:paddingBottom="6dp"
+            android:text="Info"
+            android:textColor="#B17958"
+            android:textSize="12sp" />
     </LinearLayout>
 
 </LinearLayout>
