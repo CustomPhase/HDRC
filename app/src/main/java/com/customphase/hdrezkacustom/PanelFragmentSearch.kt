@@ -27,14 +27,15 @@ class PanelFragmentSearch : PanelFragment() {
         val view = inflater.inflate(R.layout.panel_search, container, false)
 
         if (activity == null) return view;
-        parser = (activity as MainActivity).parser
+        val mainActivity = (activity as MainActivity)
+        parser = mainActivity.parser
 
         searchView = view.findViewById(R.id.searchView)
         recyclerView = view.findViewById(R.id.searchRecyclerView)
 
         adapter = SearchAdapter { searchResult ->
             lifecycleScope.launch(Dispatchers.IO) {
-                parser.getItemCard(searchResult.url)
+                mainActivity.showMediaPanel(searchResult.url)
             }
         }
         recyclerView.layoutManager = LinearLayoutManager(view.context)

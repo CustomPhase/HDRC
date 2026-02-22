@@ -37,8 +37,8 @@ class MainActivity : AppCompatActivity() {
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (panelHistory.count() > 1) {
-                    switchToPanel(panelHistory.pop())
+                if (panelHistory.count() > 0) {
+                    switchToPanel(panelHistory.pop(), false)
                 } else {
                     if (System.currentTimeMillis() - backPressedTime < exitInterval) {
                         // Exit the app on the second back press within the interval
@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 
         initializeFocusDebug()
         initializePanels()
-        switchToPanel(defaultPanel)
+        switchToPanel(defaultPanel, false)
     }
 
     private fun initializeFocusDebug() {
@@ -75,6 +75,7 @@ class MainActivity : AppCompatActivity() {
         panels[PanelFragmentHistory::class.java] = PanelFragmentHistory()
         panels[PanelFragmentSearch::class.java] = PanelFragmentSearch()
         panels[PanelFragmentSettings::class.java] = PanelFragmentSettings()
+        panels[PanelFragmentMediaItem::class.java] = PanelFragmentMediaItem()
 
         val transaction = supportFragmentManager.beginTransaction()
         for (panel in panels.values) {
@@ -87,7 +88,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun initializePanelsNavigation() {
         val navigationContainer = findViewById<LinearLayout>(R.id.navigation_container)
-        panels.forEach { (panelClass, fragment) ->
+        for ((panelClass, fragment) in panels) {
+            if (fragment.iconResource < 0) continue
+
             val panel = fragment as PanelFragment
             val itemView = layoutInflater.inflate(R.layout.navigation_button, navigationContainer, false)
             val icon = itemView.findViewById<ImageView>(R.id.nav_icon)
@@ -95,17 +98,19 @@ class MainActivity : AppCompatActivity() {
             icon.setImageResource(panel.iconResource)
             text.text = panel.title
             itemView.setOnClickListener {
-                switchToPanel(panelClass)
+                switchToPanel(panelClass, true)
             }
             navigationContainer.addView(itemView)
         }
     }
 
-    private fun switchToPanel(panelClass: Class<out PanelFragment>) {
+    private fun switchToPanel(panelClass: Class<out PanelFragment>, addToHistory: Boolean) {
+        if (addToHistory && currentPanel != null)
+            panelHistory.push(currentPanel!!::class.java)
+
         val targetPanel = panels[panelClass] ?: return
         if (targetPanel == currentPanel) return
 
-        panelHistory.add(panelClass)
         val transaction = supportFragmentManager.beginTransaction()
         currentPanel?.onDisable()
         currentPanel?.let { transaction.hide(it)}
@@ -113,5 +118,11 @@ class MainActivity : AppCompatActivity() {
         transaction.commit()
         targetPanel.onEnable()
         currentPanel = targetPanel
+    }
+
+    fun showMediaPanel(url: String) {
+        switchToPanel(PanelFragmentMediaItem::class.java, true)
+        val mediaPanel = panels[PanelFragmentMediaItem::class.java] as PanelFragmentMediaItem
+        mediaPanel.loadMedia(url)
     }
 }
