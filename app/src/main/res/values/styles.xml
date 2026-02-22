@@ -32,22 +32,13 @@
 
     <style name="SearchResultItemImage">
         <item name="android:layout_width">60dp</item>
-        <item name="android:layout_weight">0</item>
     </style>
 
     <style name="SearchResultItemTitle">
         <item name="android:textSize">16sp</item>
-        <item name="android:paddingLeft">10dp</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:textAlignment">gravity</item>
-        <item name="android:layout_gravity">center_vertical</item>
     </style>
 
     <style name="SearchResultItemInfo">
-        <item name="android:paddingLeft">6dp</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:textAlignment">gravity</item>
-        <item name="android:layout_gravity">center_vertical</item>
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">#998877</item>
     </style>

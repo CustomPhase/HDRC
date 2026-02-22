@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.SearchView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -67,13 +66,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         searchView = findViewById(R.id.searchView)
-        recyclerView = findViewById(R.id.recyclerView)
+        recyclerView = findViewById(R.id.searchRecyclerView)
 
         // Настройка RecyclerView
         adapter = SearchAdapter { searchResult ->
-            // Здесь можно открыть экран с деталями фильма
-            Toast.makeText(this, "Клик: ${searchResult.url}", Toast.LENGTH_SHORT).show()
-            // TODO: Переход к просмотру
+            lifecycleScope.launch(Dispatchers.IO) {
+                parser.getItemCard(searchResult.url)
+            }
         }
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter

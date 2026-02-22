@@ -54,6 +54,38 @@ class HDRezkaParser(val context: Context) {
 
     private val client = unsafeOkHttpClient.newBuilder().cookieJar(cookieJar).build()
 
+    // Выполнение HTTP-запроса
+    private suspend fun makeRequest(url: String): String? {
+        val request = Request.Builder()
+            .url(url)
+            .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36")
+            .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
+            //.addHeader("Accept-Encoding", "deflate, br, zstd")
+            .addHeader("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7")
+            .addHeader("Host", "rezka.ag")
+            .addHeader("Referer", "https://rezka.ag/")
+            .addHeader("Cache-Control", "no-cache")
+            .addHeader("Connection", "keep-alive")
+            .addHeader("Pragma", "no-cache")
+            .addHeader("Sec-Ch-Ua", "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\"")
+            .addHeader("Sec-Ch-Ua-Mobile", "?0")
+            .addHeader("Sec-Ch-Ua-Platform", "\"Windows\"")
+            .addHeader("Sec-Fetch-Dest", "document")
+            .addHeader("Sec-Fetch-Mode", "navigate")
+            .addHeader("Sec-Fetch-Site", "same-origin")
+            .addHeader("Sec-Fetch-User", "?1")
+            .build()
+
+        return try {
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) response.body?.string() else null
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
+    }
+
     suspend fun warmup() {
         val url = context.getString(R.string.site_url)
         makeRequest(url)
@@ -66,14 +98,13 @@ class HDRezkaParser(val context: Context) {
         val encodedQuery = java.net.URLEncoder.encode(query, "utf-8")
         // Используйте актуальное зеркало rezka
         val url = "${context.getString(R.string.site_url)}/search/?do=search&subaction=search&q=$encodedQuery"
-        println(url)
         val html = makeRequest(url)
         if (html == null) {
             println("REQUEST FAILED")
             return results
         }
 
-        val doc: Document = Jsoup.parse(html)
+        val doc = Jsoup.parse(html)
         // Селекторы могут меняться, проверьте на сайте!
         val items = doc.select("div.b-content__inline_item")
 
@@ -106,35 +137,17 @@ class HDRezkaParser(val context: Context) {
         return results
     }
 
-    // Выполнение HTTP-запроса
-    private suspend fun makeRequest(url: String): String? {
-        val request = Request.Builder()
-            .url(url)
-            .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36")
-            .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
-            //.addHeader("Accept-Encoding", "deflate, br, zstd")
-            .addHeader("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7")
-            .addHeader("Host", "rezka.ag")
-            .addHeader("Referer", "https://rezka.ag/")
-            .addHeader("Cache-Control", "no-cache")
-            .addHeader("Connection", "keep-alive")
-            .addHeader("Pragma", "no-cache")
-            .addHeader("Sec-Ch-Ua", "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\"")
-            .addHeader("Sec-Ch-Ua-Mobile", "?0")
-            .addHeader("Sec-Ch-Ua-Platform", "\"Windows\"")
-            .addHeader("Sec-Fetch-Dest", "document")
-            .addHeader("Sec-Fetch-Mode", "navigate")
-            .addHeader("Sec-Fetch-Site", "same-origin")
-            .addHeader("Sec-Fetch-User", "?1")
-            .build()
-
-        return try {
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) response.body?.string() else null
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-            null
+    suspend fun getItemCard(itemUrl: String) {
+        val html = makeRequest(itemUrl)
+        if (html == null) {
+            println("REQUEST FAILED")
+            return
         }
+        val doc = Jsoup.parse(html)
+
+    }
+
+    suspend fun updateItemCard(itemUrl: String) {
+
     }
 }
