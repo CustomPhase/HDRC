@@ -82,22 +82,25 @@ class HDRezkaParser(val context: Context) {
             val coverDiv = item.selectFirst("div.b-content__inline_item-cover")
 
             var title = "!!! PARSER BROKE !!!"
-            var itemUrl = ""
-            var poster = ""
+            var url = ""
+            var imageUrl = ""
             var info = ""
 
             if (linkDiv != null) {
                 val linkElement = linkDiv.selectFirst("a")
-                if (linkElement != null) title = linkElement.text()
+                if (linkElement != null) {
+                    title = linkElement.text()
+                    url = linkElement.attr("href")
+                }
                 val infoElement = linkDiv.select("div")[1]
                 if (infoElement != null) info = infoElement.text()
             }
 
             if (coverDiv != null) {
                 val coverElement = coverDiv.selectFirst("img")
-                if (coverElement != null) poster = coverElement.attr("src")
+                if (coverElement != null) imageUrl = coverElement.attr("src")
             }
-            results.add(SearchResult(title, itemUrl, poster, info))
+            results.add(SearchResult(title, url, imageUrl, info))
         }
 
         return results

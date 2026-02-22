@@ -52,12 +52,10 @@ class SearchAdapter(private val onItemClick: (SearchResult) -> Unit) :
             //description.text = result.description ?: "Описание отсутствует"
 
             // Загрузка постера (пока без Glide, можно просто показать заглушку)
-            if (result.posterUrl != null) {
+            if (result.imageUrl != null) {
                 // Здесь можно использовать Glide или Picasso, но для простоты оставим пустым
                 // Например:
                 // Glide.with(itemView.context).load(result.posterUrl).into(poster)
-            } else {
-                image.setImageResource(android.R.drawable.ic_menu_report_image)
             }
 
             itemView.setOnClickListener {

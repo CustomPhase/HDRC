@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
         // Настройка RecyclerView
         adapter = SearchAdapter { searchResult ->
             // Здесь можно открыть экран с деталями фильма
-            Toast.makeText(this, "Клик: ${searchResult.title}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Клик: ${searchResult.url}", Toast.LENGTH_SHORT).show()
             // TODO: Переход к просмотру
         }
         recyclerView.layoutManager = LinearLayoutManager(this)
