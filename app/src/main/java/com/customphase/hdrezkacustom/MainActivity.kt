@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (panelHistory.count() > 0) {
+                if (panelHistory.isNotEmpty()) {
                     switchToPanel(panelHistory.pop(), false)
                 } else {
                     if (System.currentTimeMillis() - backPressedTime < exitInterval) {
@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun switchToPanel(panelClass: Class<out PanelFragment>, addToHistory: Boolean) {
         if (addToHistory && currentPanel != null) {
-            if (panelHistory.count() > 16) panelHistory.removeLast()
+            if (panelHistory.size > 16) panelHistory.removeLast()
             panelHistory.push(currentPanel!!::class.java)
         }
 

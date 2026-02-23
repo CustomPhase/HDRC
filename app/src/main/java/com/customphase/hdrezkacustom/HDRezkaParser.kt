@@ -78,6 +78,9 @@ class HDRezkaParser(val context: Context) {
 
         return try {
             client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    println("Request failed: error ${response.code}")
+                }
                 if (response.isSuccessful) response.body?.string() else null
             }
         } catch (e: IOException) {
@@ -98,11 +101,7 @@ class HDRezkaParser(val context: Context) {
         val encodedQuery = java.net.URLEncoder.encode(query, "utf-8")
         // Используйте актуальное зеркало rezka
         val url = "${context.getString(R.string.site_url)}/search/?do=search&subaction=search&q=$encodedQuery"
-        val html = makeRequest(url)
-        if (html == null) {
-            println("REQUEST FAILED")
-            return results
-        }
+        val html = makeRequest(url) ?: return results
 
         val doc = Jsoup.parse(html)
         // Селекторы могут меняться, проверьте на сайте!
@@ -137,17 +136,36 @@ class HDRezkaParser(val context: Context) {
         return results
     }
 
-    suspend fun getItemCard(itemUrl: String) {
-        val html = makeRequest(itemUrl)
-        if (html == null) {
-            println("REQUEST FAILED")
-            return
-        }
+    suspend fun getMediaItem(itemUrl: String) : MediaItem {
+        val html = makeRequest(itemUrl) ?: return MediaItem()
         val doc = Jsoup.parse(html)
 
+        val title = doc.selectFirst("div.b-post__title h1")?.text()!!
+        val description = doc.selectFirst("div.b-post__description_text")?.text()!!
+
+        return MediaItem(
+            title = title,
+            description = description,
+            translators = parseMediaSelections(doc, "a.b-translator__item"),
+            seasons = parseMediaSelections(doc, "a.b-simple_season__item"),
+            episodes = parseMediaSelections(doc, "a.b-simple_episode__item"),
+        )
     }
 
-    suspend fun updateItemCard(itemUrl: String) {
+    suspend private fun parseMediaSelections(doc: Document, query : String) : MutableList<MediaSelection>{
+        val ret = mutableListOf<MediaSelection>()
+        val elements = doc.select(query)
+        for(item in elements) {
+            ret.add(MediaSelection(
+                item.text(),
+                item.attr("href"),
+                item.hasClass("active")
+            ))
+        }
+        return ret
+    }
+
+    suspend fun updateMediaItem(itemUrl: String) {
 
     }
 }

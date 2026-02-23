@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="?android:attr/borderlessButtonStyle"
+    android:layout_width="wrap_content"
+    android:layout_height="28dp"
+    android:layout_marginEnd="6dp"
+    android:background="@drawable/button_radio"
+    android:minWidth="20dp"
+    android:minHeight="10dp"
+    android:paddingLeft="12dp"
+    android:paddingTop="0dp"
+    android:paddingRight="12dp"
+    android:paddingBottom="0dp"
+    android:text="tested"
+    android:textAllCaps="false"
+    android:textColor="@color/main_text"
+    android:textSize="16sp"
+    android:singleLine="true"
+    android:ellipsize="end"
+    app:backgroundTint="@null">
+
+</Button>

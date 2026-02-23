@@ -10,5 +10,75 @@
         style="@style/PanelHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="MOVIE TITLE HERE" />
+        android:text="Загрузка..."
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="25dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/translators"
+                android:textColor="@color/main_text"
+                android:textSize="18sp" />
+
+            <GridLayout
+                android:id="@+id/translatorsView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:columnCount="3">
+            </GridLayout>
+
+            <TextView
+                android:layout_marginTop="6dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/seasons"
+                android:textColor="@color/main_text"
+                android:textSize="18sp" />
+
+            <GridLayout
+                android:id="@+id/seasonsView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:columnCount="3"/>
+
+            <TextView
+                android:layout_marginTop="6dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/episodes"
+                android:textColor="@color/main_text"
+                android:textSize="18sp" />
+
+            <GridLayout
+                android:id="@+id/episodesView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:columnCount="3"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/media_item_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.6"
+            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ullamcorper elit eget malesuada fermentum. Duis a pulvinar mauris. Etiam ut dolor orci. Vestibulum tincidunt mi in lorem dignissim, nec volutpat magna scelerisque. Sed sagittis tincidunt enim nec pharetra. Interdum et malesuada fames ac ante ipsum primis in faucibus. Cras quis rhoncus nisi.
+
+Sed tristique sollicitudin ante. Proin eleifend ac ipsum vel dictum. Vivamus eu lectus consequat augue cursus egestas ut ut arcu. Mauris interdum ipsum lorem, vel elementum lectus vehicula ut. Sed eleifend imperdiet odio, nec venenatis lacus faucibus non. Maecenas egestas venenatis iaculis. Nam quis turpis ac metus porttitor varius quis nec tellus. Nam eget velit dolor. Pellentesque euismod risus at arcu consectetur, in consequat purus rhoncus. Aliquam euismod hendrerit bibendum. Morbi sit amet arcu sit amet erat feugiat rutrum in in odio. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Mauris et posuere quam." />
+
+    </LinearLayout>
 </LinearLayout>
