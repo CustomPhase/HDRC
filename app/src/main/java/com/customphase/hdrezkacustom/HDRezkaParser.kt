@@ -3,9 +3,12 @@ package com.customphase.hdrezkacustom
 import android.content.Context
 import okhttp3.Cookie
 import okhttp3.CookieJar
+import okhttp3.FormBody
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.io.IOException
@@ -51,7 +54,7 @@ class HDRezkaParser(val context: Context) {
         }
     }
 
-    private val client = unsafeOkHttpClient.newBuilder().cookieJar(cookieJar).build()
+    val client = unsafeOkHttpClient.newBuilder().cookieJar(cookieJar).build()
 
     // Выполнение HTTP-запроса
     private suspend fun makeRequest(url: String): String? {
@@ -79,8 +82,10 @@ class HDRezkaParser(val context: Context) {
             client.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) {
                     println("Request failed: error ${response.code}")
+                    null
+                } else {
+                    response.body?.string()
                 }
-                if (response.isSuccessful) response.body?.string() else null
             }
         } catch (e: IOException) {
             e.printStackTrace()
@@ -141,8 +146,10 @@ class HDRezkaParser(val context: Context) {
 
         val title = doc.selectFirst("div.b-post__title h1")?.text() ?: "None"
         val description = doc.selectFirst("div.b-post__description_text")?.text() ?: "None"
+        val id = doc.selectFirst(".b-simple_episode__item")?.attr("data-id")?.toInt() ?: 0
 
         return MediaItem(
+            id = id,
             title = title,
             description = description,
             translators = parseMediaSelections(doc, "a.b-translator__item"),
@@ -168,5 +175,68 @@ class HDRezkaParser(val context: Context) {
             ))
         }
         return ret
+    }
+
+    suspend fun fetchCdnSeries(
+        cdnItemId: Int,
+        translatorId: Int,
+        season: Int,
+        episode: Int
+    ): String? {
+        // Build the form body exactly as seen in the JS snippet
+        val formBody = FormBody.Builder()
+            .add("id", cdnItemId.toString())
+            .add("translator_id", translatorId.toString())
+            .add("season", season.toString())
+            .add("episode", episode.toString())
+            .add("action", "get_stream")
+            .build()
+
+        // Construct the request with necessary headers
+        val request = Request.Builder()
+            .url("${context.getString(R.string.site_url)}/ajax/get_cdn_series/")   // adjust the endpoint path if needed
+            .post(formBody)
+            .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+            .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
+            .addHeader("Referer", context.getString(R.string.site_url))                     // some sites check this
+            .addHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+            .addHeader("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7")
+            .addHeader("Host", "rezka.ag")
+            .addHeader("Referer", "https://rezka.ag/")
+            .addHeader("Cache-Control", "no-cache")
+            .addHeader("Connection", "keep-alive")
+            .addHeader("Pragma", "no-cache")
+            .addHeader("Sec-Ch-Ua", "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\"")
+            .addHeader("Sec-Ch-Ua-Mobile", "?0")
+            .addHeader("Sec-Ch-Ua-Platform", "\"Windows\"")
+            .addHeader("Sec-Fetch-Dest", "document")
+            .addHeader("Sec-Fetch-Mode", "navigate")
+            .addHeader("Sec-Fetch-Site", "same-origin")
+            .addHeader("Sec-Fetch-User", "?1")
+            .build()
+
+        return try {
+            client.newCall(request).execute().use { response ->
+                val body = response.body
+                if (!response.isSuccessful || body == null) {
+                    println("Request failed: error ${response.code}")
+                    null
+                } else {
+                    val jsonObject = JSONObject(body.string())
+                    val urls = jsonObject.getString("url").toString().split(",")
+                    val qualities = mutableMapOf<String, String>()
+                    for (url in urls) {
+                        val parts = url.split(" or ")
+                        val quality = parts[0].substringAfter("[").substringBefore("]")
+                        val link = parts[0].substringAfter("]").replace("\\/", "/")
+                        qualities.put(quality, link)
+                    }
+                    qualities["1080p"]
+                }
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
     }
 }

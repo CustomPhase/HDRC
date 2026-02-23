@@ -1,6 +1,7 @@
 package com.customphase.hdrezkacustom
 
 data class MediaItem(
+    val id : Int = 0,
     val title : String = "None",
     val description : String = "None",
     val translators : List<MediaSelection> = listOf(),

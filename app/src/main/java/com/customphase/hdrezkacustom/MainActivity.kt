@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity() {
         panels[PanelFragmentSearch::class.java] = PanelFragmentSearch()
         panels[PanelFragmentSettings::class.java] = PanelFragmentSettings()
         panels[PanelFragmentMediaItem::class.java] = PanelFragmentMediaItem()
+        panels[PanelFragmentPlayer::class.java] = PanelFragmentPlayer()
 
         val transaction = supportFragmentManager.beginTransaction()
         for (panel in panels.values) {
@@ -126,5 +127,10 @@ class MainActivity : AppCompatActivity() {
         switchToPanel(PanelFragmentMediaItem::class.java, true)
         val mediaPanel = panels[PanelFragmentMediaItem::class.java] as PanelFragmentMediaItem
         mediaPanel.loadMedia(url)
+    }
+
+    fun showPlayerPanel(streamUrl : String) {
+        switchToPanel(PanelFragmentPlayer::class.java, true)
+        (panels[PanelFragmentPlayer::class.java] as PanelFragmentPlayer).play(streamUrl)
     }
 }

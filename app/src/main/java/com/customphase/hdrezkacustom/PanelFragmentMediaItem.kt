@@ -32,12 +32,14 @@ class PanelFragmentMediaItem : PanelFragment() {
         return view
     }
 
+    private var currentItemId : Int = 0
     private var currentTranslatorId : Int = 0
     private var currentSeasonId : Int = 0
 
     fun loadMedia(url: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             val item = (activity as MainActivity).parser.getMediaItem(url)
+            currentItemId = item.id
             withContext(Dispatchers.Main) {
                 currentTranslatorId = item.translators.first { mediaSelection -> mediaSelection.active }.translatorId
                 currentSeasonId = item.seasons.first { mediaSelection -> mediaSelection.active }.seasonId
@@ -140,7 +142,15 @@ class PanelFragmentMediaItem : PanelFragment() {
     }
 
     private fun onEpisodeClick(episodeId : Int) {
-        println("OPEN: translator $currentTranslatorId, season $currentSeasonId, episode $episodeId");
+        lifecycleScope.launch(Dispatchers.IO) {
+            val streamUrl = (activity as MainActivity).parser.fetchCdnSeries(
+                currentItemId,
+                currentTranslatorId,
+                currentSeasonId,
+                episodeId
+            )
+            (activity as MainActivity).showPlayerPanel(streamUrl ?: "")
+        }
     }
 
     private fun updateMediaSelections(url: String) {
