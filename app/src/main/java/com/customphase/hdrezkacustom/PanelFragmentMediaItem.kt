@@ -90,7 +90,7 @@ class PanelFragmentMediaItem : PanelFragment() {
             }
             btn.setOnClickListener {
                 if (selectionsType == SelectionsType.Translator) {
-                    onTranslationClick(sel.translatorId, sel.url)
+                    onTranslatorClick(sel.translatorId, sel.url)
                 }
                 if (selectionsType == SelectionsType.Season) {
                     onSeasonClick(sel.seasonId)
@@ -104,10 +104,19 @@ class PanelFragmentMediaItem : PanelFragment() {
         }
     }
 
-    private fun onTranslationClick(translatorId : Int, url : String) {
+    private fun onTranslatorClick(translatorId : Int, url : String) {
         if (currentTranslatorId == translatorId) return
+
         currentTranslatorId = translatorId
-        updateMediaSelections(url)
+        val currentView = view
+        if (currentView != null) {
+            val translatorsView = currentView.findViewById<GridLayout>(R.id.translatorsView)
+            for (child in translatorsView.children) {
+                val childSel = child.tag as MediaSelection
+                child.isActivated = childSel.translatorId == currentTranslatorId
+            }
+            updateMediaSelections(url)
+        }
     }
 
     private fun onSeasonClick(seasonId : Int) {
@@ -140,8 +149,8 @@ class PanelFragmentMediaItem : PanelFragment() {
             withContext(Dispatchers.Main) {
                 val currentView = view
                 if (currentView != null) {
-                    val translatorsView = currentView.findViewById<GridLayout>(R.id.translatorsView)
-                    createMediaSelections(translatorsView, item, SelectionsType.Translator)
+                    //val translatorsView = currentView.findViewById<GridLayout>(R.id.translatorsView)
+                    //createMediaSelections(translatorsView, item, SelectionsType.Translator)
                     val seasonsView = currentView.findViewById<GridLayout>(R.id.seasonsView)
                     createMediaSelections(seasonsView, item, SelectionsType.Season)
                     val episodesView = currentView.findViewById<GridLayout>(R.id.episodesView)
