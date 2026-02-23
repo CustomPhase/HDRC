@@ -32,7 +32,6 @@ class HDRezkaParser(val context: Context) {
     private val unsafeOkHttpClient: OkHttpClient
     get() {
         return try {
-            // Trust manager, который доверяет всем сертификатам
             val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
                 override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
                 override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
@@ -140,8 +139,8 @@ class HDRezkaParser(val context: Context) {
         val html = makeRequest(itemUrl) ?: return MediaItem()
         val doc = Jsoup.parse(html)
 
-        val title = doc.selectFirst("div.b-post__title h1")?.text()!!
-        val description = doc.selectFirst("div.b-post__description_text")?.text()!!
+        val title = doc.selectFirst("div.b-post__title h1")?.text() ?: "None"
+        val description = doc.selectFirst("div.b-post__description_text")?.text() ?: "None"
 
         return MediaItem(
             title = title,
@@ -156,16 +155,18 @@ class HDRezkaParser(val context: Context) {
         val ret = mutableListOf<MediaSelection>()
         val elements = doc.select(query)
         for(item in elements) {
+            var seasonId = 0
+            if (item.hasAttr("data-tab_id")) seasonId = item.attr("data-tab_id").toInt()
+            if (item.hasAttr("data-season_id")) seasonId = item.attr("data-season_id").toInt()
             ret.add(MediaSelection(
                 item.text(),
                 item.attr("href"),
-                item.hasClass("active")
+                item.hasClass("active"),
+                if (item.hasAttr("data-translator_id")) item.attr("data-translator_id").toInt() else 0,
+                seasonId,
+                if (item.hasAttr("data-episode_id")) item.attr("data-episode_id").toInt() else 0
             ))
         }
         return ret
-    }
-
-    suspend fun updateMediaItem(itemUrl: String) {
-
     }
 }
