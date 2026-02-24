@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <solid android:color="@color/main_foreground" /> <!-- Яркий фиолетовый -->
+            <corners android:radius="30dp" />   <!-- Радиус скругления, как у кружка -->
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape>
+            <solid android:color="@color/main_background" /> <!-- Тёмный фиолетовый для нажатия -->
+            <corners android:radius="30dp" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="#00000000" />
+        </shape>
+    </item>
+</selector>
