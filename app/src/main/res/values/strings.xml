@@ -2,9 +2,10 @@
     <string name="app_name">HDRezka Custom</string>
     <string name="view_history">История просмотра:</string>
     <string name="settings">Настройки:</string>
-    <string name="translators">Переводы:</string>
-    <string name="seasons">Сезоны:</string>
-    <string name="episodes">Эпизоды:</string>
+    <string name="translators">Выберите перевод:</string>
+    <string name="unknown_translator">Неизвестный перевод</string>
+    <string name="seasons">Выберите сезон:</string>
+    <string name="episodes">Выберите эпизод:</string>
     <string name="site_url">https://rezka.ag</string>
     <string name="exit_confirm">Нажмите еще раз чтобы выйти</string>
 </resources>

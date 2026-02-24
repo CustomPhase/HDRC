@@ -7,7 +7,6 @@ import okhttp3.FormBody
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -56,13 +55,10 @@ class HDRezkaParser(val context: Context) {
 
     val client = unsafeOkHttpClient.newBuilder().cookieJar(cookieJar).build()
 
-    // Выполнение HTTP-запроса
-    private suspend fun makeRequest(url: String): String? {
-        val request = Request.Builder()
-            .url(url)
+    private fun Request.Builder.addHeaders() : Request.Builder {
+            return this
             .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36")
             .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
-            //.addHeader("Accept-Encoding", "deflate, br, zstd")
             .addHeader("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7")
             .addHeader("Host", "rezka.ag")
             .addHeader("Referer", "https://rezka.ag/")
@@ -76,6 +72,13 @@ class HDRezkaParser(val context: Context) {
             .addHeader("Sec-Fetch-Mode", "navigate")
             .addHeader("Sec-Fetch-Site", "same-origin")
             .addHeader("Sec-Fetch-User", "?1")
+    }
+
+    // Выполнение HTTP-запроса
+    private suspend fun makeRequest(url: String): String? {
+        val request = Request.Builder()
+            .url(url)
+            .addHeaders()
             .build()
 
         return try {
@@ -101,14 +104,11 @@ class HDRezkaParser(val context: Context) {
     suspend fun search(query: String): List<SearchResult> {
         val results = mutableListOf<SearchResult>()
 
-        // Кодируем запрос для URL
         val encodedQuery = java.net.URLEncoder.encode(query, "utf-8")
-        // Используйте актуальное зеркало rezka
         val url = "${context.getString(R.string.site_url)}/search/?do=search&subaction=search&q=$encodedQuery"
         val html = makeRequest(url) ?: return results
 
         val doc = Jsoup.parse(html)
-        // Селекторы могут меняться, проверьте на сайте!
         val items = doc.select("div.b-content__inline_item")
 
         for (item in items) {
@@ -126,8 +126,12 @@ class HDRezkaParser(val context: Context) {
                     title = linkElement.text()
                     url = linkElement.attr("href")
                 }
+                if (coverDiv != null) {
+                    val typeText = coverDiv.select("span.cat").text()
+                    info = "($typeText) "
+                }
                 val infoElement = linkDiv.select("div")[1]
-                if (infoElement != null) info = infoElement.text()
+                if (infoElement != null) info += infoElement.text()
             }
 
             if (coverDiv != null) {
@@ -144,75 +148,85 @@ class HDRezkaParser(val context: Context) {
         val html = makeRequest(itemUrl) ?: return MediaItem()
         val doc = Jsoup.parse(html)
 
+        var initCdnPattern = Regex("""initCDNMoviesEvents\(\s*(\d+)\s*,\s*(\d+)\s*,""")
+        var initCdn = initCdnPattern.find(doc.html())
+
+        if (initCdn == null) {
+            initCdnPattern = Regex("""initCDNSeriesEvents\(\s*(\d+)\s*,\s*(\d+)\s*,""")
+            initCdn = initCdnPattern.find(doc.html())
+        }
+
         val title = doc.selectFirst("div.b-post__title h1")?.text() ?: "None"
         val description = doc.selectFirst("div.b-post__description_text")?.text() ?: "None"
-        val id = doc.selectFirst(".b-simple_episode__item")?.attr("data-id")?.toInt() ?: 0
+        val id = initCdn?.groupValues[1]?.toInt() ?: 0
+        val defaultTranslatorId = initCdn?.groupValues[2]?.toInt() ?: 0
 
         return MediaItem(
             id = id,
             title = title,
             description = description,
-            translators = parseMediaSelections(doc, "a.b-translator__item"),
-            seasons = parseMediaSelections(doc, "a.b-simple_season__item"),
-            episodes = parseMediaSelections(doc, "a.b-simple_episode__item"),
+            defaultTranslatorId = defaultTranslatorId,
+            translators = parseMediaSelections(doc, ".b-translator__item"),
+            seasons = parseMediaSelections(doc, ".b-simple_season__item"),
+            episodes = parseMediaSelections(doc, ".b-simple_episode__item"),
         )
     }
 
-    suspend private fun parseMediaSelections(doc: Document, query : String) : MutableList<MediaSelection>{
-        val ret = mutableListOf<MediaSelection>()
+    suspend private fun parseMediaSelections(doc: Document, query : String) : MutableList<MediaItemSelection>{
+        val ret = mutableListOf<MediaItemSelection>()
         val elements = doc.select(query)
         for(item in elements) {
+
+            var translatorId = 0
+            if (item.hasAttr("data-translator_id")) translatorId = item.attr("data-translator_id").toInt()
+
             var seasonId = 0
             if (item.hasAttr("data-tab_id")) seasonId = item.attr("data-tab_id").toInt()
             if (item.hasAttr("data-season_id")) seasonId = item.attr("data-season_id").toInt()
-            ret.add(MediaSelection(
+
+            var episodeId = 0
+            if (item.hasAttr("data-episode_id")) episodeId = item.attr("data-episode_id").toInt()
+
+            ret.add(MediaItemSelection(
                 item.text(),
-                item.attr("href"),
                 item.hasClass("active"),
-                if (item.hasAttr("data-translator_id")) item.attr("data-translator_id").toInt() else 0,
+                translatorId,
                 seasonId,
-                if (item.hasAttr("data-episode_id")) item.attr("data-episode_id").toInt() else 0
+                episodeId,
+                item.attr("data-director")?.toBoolean() ?: false
             ))
         }
         return ret
     }
 
-    suspend fun fetchCdnSeries(
-        cdnItemId: Int,
-        translatorId: Int,
-        season: Int,
-        episode: Int
-    ): String? {
-        // Build the form body exactly as seen in the JS snippet
+    fun fetchCdnSeries(
+        isMovie : Boolean,
+        itemId : Int,
+        translatorId : Int,
+        seasonId : Int,
+        episodeId : Int,
+        isDirector : Boolean
+    ) : String? {
+
+        val actionType = if (isMovie) "movie" else "stream"
+
         val formBody = FormBody.Builder()
-            .add("id", cdnItemId.toString())
+            .add("id", itemId.toString())
             .add("translator_id", translatorId.toString())
-            .add("season", season.toString())
-            .add("episode", episode.toString())
-            .add("action", "get_stream")
+            .add("season", seasonId.toString())
+            .add("episode", episodeId.toString())
+            .add("is_camrip", "0")
+            .add("is_ads", "0")
+            .add("is_director", if (isDirector) "1" else "0")
+            .add("action", "get_$actionType")
             .build()
 
-        // Construct the request with necessary headers
         val request = Request.Builder()
             .url("${context.getString(R.string.site_url)}/ajax/get_cdn_series/")   // adjust the endpoint path if needed
             .post(formBody)
-            .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+            .addHeaders()
             .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
-            .addHeader("Referer", context.getString(R.string.site_url))                     // some sites check this
             .addHeader("Accept", "application/json, text/javascript, */*; q=0.01")
-            .addHeader("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7")
-            .addHeader("Host", "rezka.ag")
-            .addHeader("Referer", "https://rezka.ag/")
-            .addHeader("Cache-Control", "no-cache")
-            .addHeader("Connection", "keep-alive")
-            .addHeader("Pragma", "no-cache")
-            .addHeader("Sec-Ch-Ua", "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\"")
-            .addHeader("Sec-Ch-Ua-Mobile", "?0")
-            .addHeader("Sec-Ch-Ua-Platform", "\"Windows\"")
-            .addHeader("Sec-Fetch-Dest", "document")
-            .addHeader("Sec-Fetch-Mode", "navigate")
-            .addHeader("Sec-Fetch-Site", "same-origin")
-            .addHeader("Sec-Fetch-User", "?1")
             .build()
 
         return try {

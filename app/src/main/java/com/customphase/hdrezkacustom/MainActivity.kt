@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity() {
     fun showMediaPanel(url: String) {
         switchToPanel(PanelFragmentMediaItem::class.java, true)
         val mediaPanel = panels[PanelFragmentMediaItem::class.java] as PanelFragmentMediaItem
-        mediaPanel.loadMedia(url)
+        mediaPanel.loadMediaItem(url)
     }
 
     fun showPlayerPanel(streamUrl : String) {

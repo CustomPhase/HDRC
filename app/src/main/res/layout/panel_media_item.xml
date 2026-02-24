@@ -33,54 +33,22 @@
                 android:orientation="vertical"
                 android:paddingRight="10dp">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/translators"
-                    android:textColor="@color/main_text"
-                    android:textSize="18sp" />
+                <include
+                    android:id="@+id/media_item_translators"
+                    layout="@layout/media_item_selections" />
 
-                <GridLayout
-                    android:id="@+id/translatorsView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:columnCount="3"
-                    android:orientation="horizontal"></GridLayout>
+                <include
+                    android:id="@+id/media_item_seasons"
+                    layout="@layout/media_item_selections" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="@string/seasons"
-                    android:textColor="@color/main_text"
-                    android:textSize="18sp" />
-
-                <GridLayout
-                    android:id="@+id/seasonsView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:columnCount="3"
-                    android:orientation="horizontal" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="@string/episodes"
-                    android:textColor="@color/main_text"
-                    android:textSize="18sp" />
-
-                <GridLayout
-                    android:id="@+id/episodesView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:columnCount="3"
-                    android:orientation="horizontal" />
+                <include
+                    android:id="@+id/media_item_episodes"
+                    layout="@layout/media_item_selections" />
             </LinearLayout>
         </ScrollView>
 
         <TextView
-            android:id="@+id/media_item_desc"
+            android:id="@+id/media_item_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1.6"
