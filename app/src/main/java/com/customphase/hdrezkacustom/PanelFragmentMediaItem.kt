@@ -16,9 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class PanelFragmentMediaItem : PanelFragment() {
-
     private var currentItemId : Int = 0
-    private var isMovie : Boolean = false
 
     override val iconResource: Int
         get() = -1
@@ -33,7 +31,18 @@ class PanelFragmentMediaItem : PanelFragment() {
 
     fun loadMediaItem(url: String) {
         lifecycleScope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.Main) {
+                view?.findViewById<TextView>(R.id.media_item_title)?.text = ""
+                view?.findViewById<View>(R.id.media_item_content)?.visibility = View.GONE
+                view?.findViewById<View>(R.id.mediaItemLoadingIndicator)?.visibility = View.VISIBLE
+
+                view?.findViewById<View>(R.id.media_item_translators)?.visibility = View.GONE
+                view?.findViewById<View>(R.id.media_item_seasons)?.visibility = View.GONE
+                view?.findViewById<View>(R.id.media_item_episodes)?.visibility = View.GONE
+            }
+
             val item = (activity as MainActivity).parser.getMediaItem(url)
+            currentItemId = item.id
             if (item.translators.isEmpty()) {
                 item.translators = listOf(
                     MediaItemSelection(
@@ -46,43 +55,47 @@ class PanelFragmentMediaItem : PanelFragment() {
                     )
                 )
             }
-            isMovie = item.seasons.isEmpty()
-            currentItemId = item.id
+            val isMovie = item.seasons.isEmpty()
             var selectedSeasonId = -1;
             if (item.seasons.isNotEmpty()) {
                 selectedSeasonId = item.seasons.firstOrNull { it.active }?.seasonId ?: -1
             }
             withContext(Dispatchers.Main) {
-                val currentView = view
-                if (currentView != null) {
-                    currentView.findViewById<TextView>(R.id.media_item_title)?.text = item.title
-                    currentView.findViewById<TextView>(R.id.media_item_description)?.text = item.description
+                view?.findViewById<View>(R.id.media_item_content)?.visibility = View.VISIBLE
+                view?.findViewById<View>(R.id.mediaItemLoadingIndicator)?.visibility = View.GONE
 
-                    createMediaSelections(
-                        R.id.media_item_translators,
-                        R.string.translators,
-                        item.translators,
-                        selectedSeasonId
-                    ) {
-                        onTranslatorClick(it)
-                    }
+                view?.findViewById<TextView>(R.id.media_item_title)?.text = item.title
+                view?.findViewById<TextView>(R.id.media_item_description)?.text = item.description
 
+                createMediaSelections(
+                    R.id.media_item_translators,
+                    R.string.translators,
+                    item.translators,
+                    selectedSeasonId,
+                    isMovie
+                ) { p1, p2 ->
+                    onTranslatorClick(p1, p2)
+                }
+
+                if (!isMovie) {
                     createMediaSelections(
                         R.id.media_item_seasons,
                         R.string.seasons,
                         item.seasons,
-                        selectedSeasonId
-                    ) {
-                        onSeasonClick(it)
+                        selectedSeasonId,
+                        isMovie
+                    ) { p1, p2 ->
+                        onSeasonClick(p1, p2)
                     }
 
                     createMediaSelections(
                         R.id.media_item_episodes,
                         R.string.episodes,
                         item.episodes,
-                        selectedSeasonId
-                    ) {
-                        onEpisodeClick(it)
+                        selectedSeasonId,
+                        isMovie
+                    ) { p1, p2 ->
+                        onEpisodeClick(p1, p2)
                     }
                 }
             }
@@ -93,13 +106,11 @@ class PanelFragmentMediaItem : PanelFragment() {
                                       titleId : Int,
                                       selections : List<MediaItemSelection>,
                                       selectedSeasonId: Int,
-                                      onClick: (View) -> Unit) {
+                                      isMovie : Boolean,
+                                      onClick: (View, Boolean) -> Unit) {
         val currentView = view ?: return
+
         val parentView = currentView.findViewById<LinearLayout>(parentId)
-        if (selections.isEmpty()) {
-            parentView.visibility = View.GONE
-            return
-        }
         parentView.visibility = View.VISIBLE
 
         val title = parentView.children.first{it is TextView} as TextView
@@ -120,18 +131,18 @@ class PanelFragmentMediaItem : PanelFragment() {
                 columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                 rowSpec = GridLayout.spec(GridLayout.UNDEFINED)
                 width = 0
-                setMargins(4, 4, 4, 4)
+                setMargins(0, 4, 8, 4)
             }
             btn.layoutParams = params
             btn.tag = sel
             btn.setOnClickListener {
-                onClick(btn)
+                onClick(btn, isMovie)
             }
             grid.addView(btn)
         }
     }
 
-    private fun onTranslatorClick(btn : View) {
+    private fun onTranslatorClick(btn : View, isMovie : Boolean) {
         if (btn.isActivated) return
 
         val parent = btn.parent as GridLayout
@@ -191,7 +202,7 @@ class PanelFragmentMediaItem : PanelFragment() {
         }*/
     }
 
-    private fun onSeasonClick(btn : View) {
+    private fun onSeasonClick(btn : View, isMovie : Boolean) {
         /*if (currentSeasonId == seasonId) return
         val currentView = view
         if (currentView != null) {
@@ -211,7 +222,7 @@ class PanelFragmentMediaItem : PanelFragment() {
         }*/
     }
 
-    private fun onEpisodeClick(btn : View) {
+    private fun onEpisodeClick(btn : View, isMovie : Boolean) {
         /*lifecycleScope.launch(Dispatchers.IO) {
             val streamUrl = (activity as MainActivity).parser.fetchCdnSeries(
                 currentItemId,
