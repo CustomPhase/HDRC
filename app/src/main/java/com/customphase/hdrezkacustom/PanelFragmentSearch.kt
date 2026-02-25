@@ -9,6 +9,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -16,12 +18,13 @@ class PanelFragmentSearch : PanelFragment() {
     override val iconResource: Int
         get() = R.drawable.icon_search
     override val title: String
-        get() = "Поиск"
+        get() = getString(R.string.nav_search)
 
     private lateinit var searchView: SearchView
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: SearchAdapter
     private lateinit var parser : HDRezkaParser
+    private var searchJob : Job? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.panel_search, container, false)
@@ -63,7 +66,8 @@ class PanelFragmentSearch : PanelFragment() {
     }
 
     private fun performSearch(query: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
+        searchJob?.cancel()
+        searchJob = lifecycleScope.launch(Dispatchers.IO) {
             val results = parser.search(query)
             withContext(Dispatchers.Main) {
                 adapter.submitList(results)
