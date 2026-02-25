@@ -9,7 +9,7 @@ class PanelFragmentHistory : PanelFragment() {
     override val iconResource: Int
         get() = R.drawable.icon_history
     override val title: String
-        get() = getString(R.string.nav_view_history)
+        get() = "История"
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.panel_history, container, false)

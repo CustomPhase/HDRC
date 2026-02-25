@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.SearchView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,10 +19,11 @@ class PanelFragmentSearch : PanelFragment() {
     override val iconResource: Int
         get() = R.drawable.icon_search
     override val title: String
-        get() = getString(R.string.nav_search)
+        get() = "Поиск"
 
     private lateinit var searchView: SearchView
     private lateinit var recyclerView: RecyclerView
+    private lateinit var searchLoading : View
     private lateinit var adapter: SearchAdapter
     private lateinit var parser : HDRezkaParser
     private var searchJob : Job? = null
@@ -35,6 +37,7 @@ class PanelFragmentSearch : PanelFragment() {
 
         searchView = view.findViewById(R.id.searchView)
         recyclerView = view.findViewById(R.id.searchRecyclerView)
+        searchLoading = view.findViewById(R.id.searchLoadingIndicator)
 
         adapter = SearchAdapter { searchResult ->
             lifecycleScope.launch(Dispatchers.IO) {
@@ -67,11 +70,14 @@ class PanelFragmentSearch : PanelFragment() {
 
     private fun performSearch(query: String) {
         searchJob?.cancel()
+        searchLoading.visibility = View.VISIBLE
+        recyclerView.visibility = View.GONE
         searchJob = lifecycleScope.launch(Dispatchers.IO) {
             val results = parser.search(query)
             withContext(Dispatchers.Main) {
                 adapter.submitList(results)
-                recyclerView.visibility = if (results.isEmpty()) View.GONE else View.VISIBLE
+                searchLoading.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
             }
         }
     }

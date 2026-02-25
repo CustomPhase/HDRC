@@ -19,6 +19,11 @@
         app:theme="@style/SearchViewTheme"
         android:queryHint="Поиск..."></SearchView>
 
+    <include
+        layout="@layout/loading_indicator"
+        android:id="@+id/searchLoadingIndicator"
+        android:visibility="gone"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/searchRecyclerView"
         android:layout_width="match_parent"

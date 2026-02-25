@@ -1,15 +1,8 @@
 <resources>
     <string name="app_name">HDRezka Custom</string>
     <string name="loading">Загрузка...</string>
-
     <string name="view_history">История просмотра:</string>
-    <string name="nav_view_history">История</string>
-
     <string name="settings">Настройки:</string>
-    <string name="nav_settings">Настройки</string>
-
-    <string name="nav_search">Поиск</string>
-
     <string name="translators">Выберите перевод:</string>
     <string name="unknown_translator">Неизвестный перевод</string>
     <string name="seasons">Выберите сезон:</string>

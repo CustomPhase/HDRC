@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <set>
+            <objectAnimator
+                android:propertyName="rotation"
+                android:valueTo="540" android:duration="900"
+                android:repeatCount="infinite"/>
+        </set>
+    </item>
+</selector>
