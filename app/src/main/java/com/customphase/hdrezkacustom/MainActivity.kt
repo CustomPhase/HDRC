@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
 
         val transaction = supportFragmentManager.beginTransaction()
         for (panel in panels.values) {
-            transaction.add(R.id.panel_container, panel).hide(panel)
+            transaction.add(R.id.panelContainer, panel).hide(panel)
         }
         transaction.commit()
 

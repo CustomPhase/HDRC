@@ -11,7 +11,7 @@
         android:visibility="gone"/>
 
     <TextView
-        android:id="@+id/media_item_title"
+        android:id="@+id/mediaItemTitle"
         style="@style/PanelHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:id="@+id/media_item_content">
+        android:id="@+id/mediaItemContent">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -40,21 +40,21 @@
                 android:paddingRight="10dp">
 
                 <include
-                    android:id="@+id/media_item_translators"
+                    android:id="@+id/mediaItemTranslators"
                     layout="@layout/media_item_selections" />
 
                 <include
-                    android:id="@+id/media_item_seasons"
+                    android:id="@+id/mediaItemSeasons"
                     layout="@layout/media_item_selections" />
 
                 <include
-                    android:id="@+id/media_item_episodes"
+                    android:id="@+id/mediaItemEpisodes"
                     layout="@layout/media_item_selections" />
             </LinearLayout>
         </ScrollView>
 
         <TextView
-            android:id="@+id/media_item_description"
+            android:id="@+id/mediaItemDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1.6"

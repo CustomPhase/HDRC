@@ -6,13 +6,20 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/mediaItemSelectionsTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/translators"
         android:textColor="@color/main_text"
         android:textSize="18sp" />
 
+    <include
+        layout="@layout/loading_indicator"
+        android:visibility="gone"
+        android:id="@+id/mediaItemSelectionsLoadingIndicator"/>
+
     <GridLayout
+        android:id="@+id/mediaItemSelectionsItems"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:columnCount="3"

@@ -55,7 +55,7 @@ class HDRezkaParser(val context: Context) {
 
     val client = unsafeOkHttpClient.newBuilder().cookieJar(cookieJar).build()
 
-    private fun Request.Builder.addHeaders() : Request.Builder {
+    private fun Request.Builder.addHDRezkaHeaders() : Request.Builder {
             return this
             .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36")
             .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
@@ -78,7 +78,7 @@ class HDRezkaParser(val context: Context) {
     private suspend fun makeRequest(url: String): String? {
         val request = Request.Builder()
             .url(url)
-            .addHeaders()
+            .addHDRezkaHeaders()
             .build()
 
         return try {
@@ -199,7 +199,7 @@ class HDRezkaParser(val context: Context) {
         return ret
     }
 
-    fun fetchCdnSeries(
+    suspend fun getMediaStreamUrl(
         isMovie : Boolean,
         itemId : Int,
         translatorId : Int,
@@ -222,9 +222,9 @@ class HDRezkaParser(val context: Context) {
             .build()
 
         val request = Request.Builder()
-            .url("${context.getString(R.string.site_url)}/ajax/get_cdn_series/")   // adjust the endpoint path if needed
+            .url("${context.getString(R.string.site_url)}/ajax/get_cdn_series/")
             .post(formBody)
-            .addHeaders()
+            .addHDRezkaHeaders()
             .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
             .addHeader("Accept", "application/json, text/javascript, */*; q=0.01")
             .build()
@@ -251,6 +251,43 @@ class HDRezkaParser(val context: Context) {
         } catch (e: IOException) {
             e.printStackTrace()
             null
+        }
+    }
+
+    suspend fun getMediaEpisodes(itemId : Int, translatorId : Int) : MediaItem {
+        val formBody = FormBody.Builder()
+            .add("id", itemId.toString())
+            .add("translator_id", translatorId.toString())
+            .add("action", "get_episodes")
+            .build()
+
+        val request = Request.Builder()
+            .url("${context.getString(R.string.site_url)}/ajax/get_cdn_series/")
+            .post(formBody)
+            .addHDRezkaHeaders()
+            .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
+            .addHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+            .build()
+
+        client.newCall(request).execute().use { response ->
+            val body = response.body
+            if (!response.isSuccessful || body == null) {
+                println("Request failed: error ${response.code}")
+                return MediaItem()
+            } else {
+                val jsonObject = JSONObject(body.string())
+                val seasonsDoc = Jsoup.parse(jsonObject.getString("seasons"))
+                val episodesDoc = Jsoup.parse(jsonObject.getString("episodes"))
+                return MediaItem(
+                    itemId,
+                    "",
+                    "",
+                    0,
+                    listOf(),
+                    parseMediaSelections(seasonsDoc, ".b-simple_season__item"),
+                    parseMediaSelections(episodesDoc, ".b-simple_episode__item")
+                )
+            }
         }
     }
 }

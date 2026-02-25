@@ -1,7 +1,6 @@
 package com.customphase.hdrezkacustom
 
 import android.os.Bundle
-import android.service.credentials.Action
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +9,7 @@ import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,13 +32,13 @@ class PanelFragmentMediaItem : PanelFragment() {
     fun loadMediaItem(url: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             withContext(Dispatchers.Main) {
-                view?.findViewById<TextView>(R.id.media_item_title)?.text = ""
-                view?.findViewById<View>(R.id.media_item_content)?.visibility = View.GONE
+                view?.findViewById<TextView>(R.id.mediaItemTitle)?.text = ""
+                view?.findViewById<View>(R.id.mediaItemContent)?.visibility = View.GONE
                 view?.findViewById<View>(R.id.mediaItemLoadingIndicator)?.visibility = View.VISIBLE
 
-                view?.findViewById<View>(R.id.media_item_translators)?.visibility = View.GONE
-                view?.findViewById<View>(R.id.media_item_seasons)?.visibility = View.GONE
-                view?.findViewById<View>(R.id.media_item_episodes)?.visibility = View.GONE
+                view?.findViewById<View>(R.id.mediaItemTranslators)?.visibility = View.GONE
+                view?.findViewById<View>(R.id.mediaItemSeasons)?.visibility = View.GONE
+                view?.findViewById<View>(R.id.mediaItemEpisodes)?.visibility = View.GONE
             }
 
             val item = (activity as MainActivity).parser.getMediaItem(url)
@@ -61,14 +61,14 @@ class PanelFragmentMediaItem : PanelFragment() {
                 selectedSeasonId = item.seasons.firstOrNull { it.active }?.seasonId ?: -1
             }
             withContext(Dispatchers.Main) {
-                view?.findViewById<View>(R.id.media_item_content)?.visibility = View.VISIBLE
+                view?.findViewById<View>(R.id.mediaItemContent)?.visibility = View.VISIBLE
                 view?.findViewById<View>(R.id.mediaItemLoadingIndicator)?.visibility = View.GONE
 
-                view?.findViewById<TextView>(R.id.media_item_title)?.text = item.title
-                view?.findViewById<TextView>(R.id.media_item_description)?.text = item.description
+                view?.findViewById<TextView>(R.id.mediaItemTitle)?.text = item.title
+                view?.findViewById<TextView>(R.id.mediaItemDescription)?.text = item.description
 
                 createMediaSelections(
-                    R.id.media_item_translators,
+                    R.id.mediaItemTranslators,
                     R.string.translators,
                     item.translators,
                     selectedSeasonId,
@@ -79,7 +79,7 @@ class PanelFragmentMediaItem : PanelFragment() {
 
                 if (!isMovie) {
                     createMediaSelections(
-                        R.id.media_item_seasons,
+                        R.id.mediaItemSeasons,
                         R.string.seasons,
                         item.seasons,
                         selectedSeasonId,
@@ -89,7 +89,7 @@ class PanelFragmentMediaItem : PanelFragment() {
                     }
 
                     createMediaSelections(
-                        R.id.media_item_episodes,
+                        R.id.mediaItemEpisodes,
                         R.string.episodes,
                         item.episodes,
                         selectedSeasonId,
@@ -113,15 +113,15 @@ class PanelFragmentMediaItem : PanelFragment() {
         val parentView = currentView.findViewById<LinearLayout>(parentId)
         parentView.visibility = View.VISIBLE
 
-        val title = parentView.children.first{it is TextView} as TextView
-        title.text = getString(titleId)
-        val grid = parentView.children.first{it is GridLayout} as GridLayout
+        parentView.findViewById<TextView>(R.id.mediaItemSelectionsTitle).text = getString(titleId)
+        val grid = parentView.findViewById<GridLayout>(R.id.mediaItemSelectionsItems)
         grid.removeAllViews()
 
         for (sel in selections) {
             val btn = layoutInflater.inflate(R.layout.button_radio, grid, false) as Button
             btn.text = sel.title
-            if (parentId != R.id.media_item_episodes) {
+            btn.tag = sel
+            if (parentId != R.id.mediaItemEpisodes) {
                 btn.isActivated = if (isMovie) false else sel.active
             } else {
                 btn.visibility = if (sel.seasonId == selectedSeasonId) View.VISIBLE else View.GONE
@@ -134,7 +134,7 @@ class PanelFragmentMediaItem : PanelFragment() {
                 setMargins(0, 4, 8, 4)
             }
             btn.layoutParams = params
-            btn.tag = sel
+
             btn.setOnClickListener {
                 onClick(btn, isMovie)
             }
@@ -154,7 +154,7 @@ class PanelFragmentMediaItem : PanelFragment() {
 
         if (isMovie) {
             lifecycleScope.launch(Dispatchers.IO) {
-                val url = (activity as MainActivity).parser.fetchCdnSeries(
+                val url = (activity as MainActivity).parser.getMediaStreamUrl(
                     true,
                     currentItemId,
                     sel.translatorId,
@@ -167,59 +167,69 @@ class PanelFragmentMediaItem : PanelFragment() {
                 }
             }
         } else {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val seasonsView = view?.findViewById<View>(R.id.mediaItemSeasons)
+                val episodesView = view?.findViewById<View>(R.id.mediaItemEpisodes)
+                withContext(Dispatchers.Main) {
+                    seasonsView?.findViewById<GridLayout>(R.id.mediaItemSelectionsItems)?.removeAllViews()
+                    episodesView?.findViewById<GridLayout>(R.id.mediaItemSelectionsItems)?.removeAllViews()
 
-        }
+                    seasonsView?.findViewById<View>(R.id.mediaItemSelectionsLoadingIndicator)?.visibility = View.VISIBLE
+                    episodesView?.findViewById<View>(R.id.mediaItemSelectionsLoadingIndicator)?.visibility = View.VISIBLE
+                }
+                val item = (activity as MainActivity).parser.getMediaEpisodes(currentItemId, sel.translatorId)
 
-        /*lifecycleScope.launch(Dispatchers.IO) {
-            val item = (activity as MainActivity).parser.getMediaItem(sel.url)
-            println(item.seasons.size)
-            var selectedSeasonId = -1;
-            if (item.seasons.isNotEmpty()) {
-                selectedSeasonId = item.seasons.firstOrNull { it.active }?.seasonId ?: -1
-            }
-            withContext(Dispatchers.Main) {
-                val currentView = view
-                if (currentView != null) {
+                withContext(Dispatchers.Main) {
+                    seasonsView?.findViewById<View>(R.id.mediaItemSelectionsLoadingIndicator)?.visibility = View.GONE
+                    episodesView?.findViewById<View>(R.id.mediaItemSelectionsLoadingIndicator)?.visibility = View.GONE
+
+                    val selectedSeasonId = item.seasons.first { it.active }.seasonId
+
                     createMediaSelections(
-                        R.id.media_item_seasons,
+                        R.id.mediaItemSeasons,
                         R.string.seasons,
                         item.seasons,
-                        selectedSeasonId
-                    ) {
-                        onSeasonClick(it)
+                        selectedSeasonId,
+                        isMovie
+                    ) { p1, p2 ->
+                        onSeasonClick(p1, p2)
                     }
 
                     createMediaSelections(
-                        R.id.media_item_episodes,
+                        R.id.mediaItemEpisodes,
                         R.string.episodes,
                         item.episodes,
-                        selectedSeasonId
-                    ) {
-                        onEpisodeClick(it)
+                        selectedSeasonId,
+                        isMovie
+                    ) { p1, p2 ->
+                        onEpisodeClick(p1, p2)
                     }
                 }
             }
-        }*/
+        }
     }
 
     private fun onSeasonClick(btn : View, isMovie : Boolean) {
-        /*if (currentSeasonId == seasonId) return
+        if (btn.isActivated) return
+
+        val sel = btn.tag as MediaItemSelection
+
         val currentView = view
         if (currentView != null) {
-            currentSeasonId = seasonId
-
-            val seasonsView = currentView.findViewById<GridLayout>(R.id.seasonsView)
-            for (child in seasonsView.children) {
-                val childSel = child.tag as MediaSelection
-                child.isActivated = childSel.seasonId == currentSeasonId
+            val seasonsView = currentView.findViewById<ViewGroup>(R.id.mediaItemSeasons)
+            val seasonsGrid = seasonsView.findViewById<GridLayout>(R.id.mediaItemSelectionsItems)
+            for (child in seasonsGrid.children) {
+                child.isActivated = false
             }
+            btn.isActivated = true
 
-            val episodesView = currentView.findViewById<GridLayout>(R.id.episodesView)
-            for (child in episodesView.children) {
-                val childSel = child.tag as MediaSelection
-                child.visibility = if (childSel.seasonId == currentSeasonId) View.VISIBLE else View.GONE
+            val episodesView = currentView.findViewById<ViewGroup>(R.id.mediaItemEpisodes)
+            val episodesGrid = episodesView.findViewById<GridLayout>(R.id.mediaItemSelectionsItems)
+            for (child in episodesGrid.children) {
+                val childSel = child.tag as MediaItemSelection
+                child.visibility = if (childSel.seasonId == sel.seasonId) View.VISIBLE else View.GONE
             }
-        }*/
+        }
     }
 
     private fun onEpisodeClick(btn : View, isMovie : Boolean) {
