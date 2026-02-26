@@ -13,6 +13,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.internal.wait
 
 class MainActivity : AppCompatActivity() {
 
@@ -52,13 +54,15 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            parser.warmup()
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                parser.warmup()
+                parser.login("user", "pass")
+            }
+            initializeFocusDebug()
+            initializePanels()
+            switchToPanel(defaultPanel, false)
         }
-
-        initializeFocusDebug()
-        initializePanels()
-        switchToPanel(defaultPanel, false)
     }
 
     private fun initializeFocusDebug() {
@@ -129,8 +133,18 @@ class MainActivity : AppCompatActivity() {
         mediaPanel.loadMediaItem(url)
     }
 
-    fun showPlayerPanel(streams : Map<String, String>) {
+    fun showPlayerPanel(itemId : Int,
+                        translatorId : Int,
+                        seasonId : Int,
+                        episodeId : Int,
+                        isDirector : Boolean) {
         switchToPanel(PanelFragmentPlayer::class.java, true)
-        (panels[PanelFragmentPlayer::class.java] as PanelFragmentPlayer).play(streams)
+        (panels[PanelFragmentPlayer::class.java] as PanelFragmentPlayer).play(
+            itemId,
+            translatorId,
+            seasonId,
+            episodeId,
+            isDirector
+        )
     }
 }

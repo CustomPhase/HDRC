@@ -147,15 +147,13 @@ class PanelFragmentMediaItem : PanelFragment() {
         val sel = btn.tag as MediaItemSelection
         if (isMovie) {
             lifecycleScope.launch(Dispatchers.IO) {
-                val streams = (activity as MainActivity).parser.getMediaStreamUrl(
-                    true,
+                (activity as MainActivity).showPlayerPanel(
                     currentItemId,
                     sel.translatorId,
                     0,
                     0,
                     sel.isDirector
                 )
-                (activity as MainActivity).showPlayerPanel(streams)
             }
         } else {
             mediaItemTranslators.setSelected(btn)
@@ -204,18 +202,15 @@ class PanelFragmentMediaItem : PanelFragment() {
 
     private fun onEpisodeClick(btn : View, isMovie : Boolean) {
         val translatorId = mediaItemTranslators.selectedItem.second?.translatorId!!
-        val seasonId = mediaItemSeasons.selectedItem.second?.seasonId!!
         lifecycleScope.launch(Dispatchers.IO) {
             val sel = btn.tag as MediaItemSelection
-            val streams = (activity as MainActivity).parser.getMediaStreamUrl(
-                false,
+            (activity as MainActivity).showPlayerPanel(
                 currentItemId,
                 translatorId,
-                seasonId,
+                sel.seasonId,
                 sel.episodeId,
                 false
             )
-            (activity as MainActivity).showPlayerPanel(streams)
         }
     }
 }

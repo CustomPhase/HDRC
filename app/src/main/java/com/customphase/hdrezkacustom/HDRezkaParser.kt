@@ -15,19 +15,33 @@ import java.security.SecureRandom
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import java.security.cert.X509Certificate
+import java.util.Locale
 import javax.net.ssl.*
 
 class HDRezkaParser(val context: Context) {
 
     private val cookieJar = object : CookieJar {
-        private val cookieStore = mutableMapOf<String, List<Cookie>>()
+        // Храним куки по их имени, чтобы обновлять только нужные
+        private val cookieStore = mutableMapOf<String, Cookie>()
 
         override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-            cookieStore[url.host] = cookies
+            cookies.forEach { cookie ->
+                // Если сервер прислал куку, которая уже просрочена (max-age=0),
+                // мы удаляем её из нашего хранилища вместо того, чтобы сохранять "deleted"
+                if (cookie.expiresAt <= System.currentTimeMillis()) {
+                    cookieStore.remove(cookie.name)
+                } else {
+                    cookieStore[cookie.name] = cookie
+                }
+            }
         }
 
         override fun loadForRequest(url: HttpUrl): List<Cookie> {
-            return cookieStore[url.host] ?: emptyList()
+            val currentTime = System.currentTimeMillis()
+            // Фильтруем: только те, что подходят домену и еще не протухли
+            return cookieStore.values.filter {
+                it.matches(url) && it.expiresAt > currentTime
+            }
         }
     }
 
@@ -58,9 +72,10 @@ class HDRezkaParser(val context: Context) {
     private fun Request.Builder.addHDRezkaHeaders() : Request.Builder {
             return this
             .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36")
-            .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
+            .addHeader("Accept", "*/*")
             .addHeader("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7")
             .addHeader("Host", "rezka.ag")
+            .addHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
             .addHeader("Referer", "https://rezka.ag/")
             .addHeader("Cache-Control", "no-cache")
             .addHeader("Connection", "keep-alive")
@@ -69,7 +84,7 @@ class HDRezkaParser(val context: Context) {
             .addHeader("Sec-Ch-Ua-Mobile", "?0")
             .addHeader("Sec-Ch-Ua-Platform", "\"Windows\"")
             .addHeader("Sec-Fetch-Dest", "document")
-            .addHeader("Sec-Fetch-Mode", "navigate")
+            .addHeader("Sec-Fetch-Mode", "cors")
             .addHeader("Sec-Fetch-Site", "same-origin")
             .addHeader("Sec-Fetch-User", "?1")
     }
@@ -200,14 +215,13 @@ class HDRezkaParser(val context: Context) {
     }
 
     suspend fun getMediaStreamUrl(
-        isMovie : Boolean,
         itemId : Int,
         translatorId : Int,
         seasonId : Int,
         episodeId : Int,
         isDirector : Boolean
     ) : Map<String, String> {
-
+        val isMovie = seasonId <= 0
         val actionType = if (isMovie) "movie" else "stream"
 
         val formBody = FormBody.Builder()
@@ -226,7 +240,6 @@ class HDRezkaParser(val context: Context) {
             .post(formBody)
             .addHDRezkaHeaders()
             .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
-            .addHeader("Accept", "application/json, text/javascript, */*; q=0.01")
             .build()
 
         client.newCall(request).execute().use { response ->
@@ -263,7 +276,6 @@ class HDRezkaParser(val context: Context) {
             .post(formBody)
             .addHDRezkaHeaders()
             .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
-            .addHeader("Accept", "application/json, text/javascript, */*; q=0.01")
             .build()
 
         client.newCall(request).execute().use { response ->
@@ -284,6 +296,84 @@ class HDRezkaParser(val context: Context) {
                     parseMediaSelections(seasonsDoc, ".b-simple_season__item"),
                     parseMediaSelections(episodesDoc, ".b-simple_episode__item")
                 )
+            }
+        }
+    }
+
+    suspend fun login(login : String, password : String) {
+        val formBody = FormBody.Builder()
+            .add("login_name", login)
+            .add("login_password", password)
+            .add("login_not_save", "0")
+            .build()
+
+        val request = Request.Builder()
+            .url("${context.getString(R.string.site_url)}/ajax/login/")
+            .post(formBody)
+            .addHDRezkaHeaders()
+            .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
+            .build()
+
+        client.newCall(request).execute().use { response ->
+            val body = response.body
+            println("LOGIN: ${body?.string()}")
+            if (!response.isSuccessful || body == null) {
+                println("Request failed: error ${response.code}")
+            }
+        }
+    }
+
+    suspend fun saveProgress(itemId : Int,
+                             translatorId: Int,
+                             seasonId: Int,
+                             episodeId: Int,
+                             currentTime : Double,
+                             duration : Double
+    ) {
+        var formBody = FormBody.Builder()
+            .add("action", "add")
+            .add("id", itemId.toString())
+            .add("translator_id", translatorId.toString())
+            .build()
+
+        var request = Request.Builder()
+            .url("${context.getString(R.string.site_url)}/ajax/send_watching/")
+            .post(formBody)
+            .addHDRezkaHeaders()
+            .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
+            .build()
+
+        client.newCall(request).execute().use { response ->
+            val body = response.body
+            println("SENDWATCH: response code (${response.code}). ${body?.string()}")
+            if (!response.isSuccessful || body == null) {
+                println("Request failed: error ${response.code}")
+            }
+        }
+
+        formBody = FormBody.Builder()
+            .add("post_id", itemId.toString())
+            .add("translator_id", translatorId.toString())
+            .add("season", seasonId.toString())
+            .add("episode", episodeId.toString())
+            .add("current_time", String.format(Locale.ENGLISH, "%.4f", currentTime))
+            .add("duration", String.format(Locale.ENGLISH, "%.4f", duration))
+            .build()
+
+        request = Request.Builder()
+            .url("${context.getString(R.string.site_url)}/ajax/send_save/")
+            .post(formBody)
+            .addHDRezkaHeaders()
+            .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
+            .build()
+
+        println("Cookies for request: ${client.cookieJar.loadForRequest(request.url)}")
+
+        client.newCall(request).execute().use { response ->
+            val body = response.body
+            println("SAVE: response code (${response.code}). ${body?.string()}")
+            if (!response.isSuccessful || body == null) {
+                println("Request failed: error ${response.code}")
             }
         }
     }

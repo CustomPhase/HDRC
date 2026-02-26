@@ -23,6 +23,11 @@ class PanelFragmentPlayer : PanelFragment() {
 
     private lateinit var player : ExoPlayer
 
+    private var itemId : Int = 0
+    private var translatorId : Int = 0
+    private var seasonId : Int = 0
+    private var episodeId : Int = 0
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.panel_player, container, false)
         return view
@@ -39,18 +44,49 @@ class PanelFragmentPlayer : PanelFragment() {
 
     override fun onDisable() {
         player.stop()
+        lifecycleScope.launch {
+            val pos = (player.currentPosition / 1000).toDouble()
+            val dur = (player.duration / 1000).toDouble()
+            withContext(Dispatchers.IO) {
+                (activity as MainActivity).parser.saveProgress(
+                    itemId,
+                    translatorId,
+                    seasonId,
+                    episodeId,
+                    pos / dur,
+                    dur
+                )
+            }
+        }
     }
 
-    fun play(streams : Map<String, String>) {
-        lifecycleScope.launch(Dispatchers.Main) {
-            val unsafeClient = (activity as MainActivity).parser.client
-            val dataSourceFactory = OkHttpDataSource.Factory(unsafeClient)
-                .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36")
-            val mediaSource = DefaultMediaSourceFactory(dataSourceFactory)
-                .createMediaSource(MediaItem.fromUri(streams.getValue("1080p")))
-            player.setMediaSource(mediaSource)
-            player.prepare()
-            player.playWhenReady = true
+    fun play(itemId : Int,
+             translatorId : Int,
+             seasonId : Int,
+             episodeId : Int,
+             isDirector : Boolean) {
+        this.itemId = itemId
+        this.translatorId = translatorId
+        this.seasonId = seasonId
+        this.episodeId = episodeId
+        lifecycleScope.launch(Dispatchers.IO) {
+            val streams = (activity as MainActivity).parser.getMediaStreamUrl(
+                itemId,
+                translatorId,
+                seasonId,
+                episodeId,
+                isDirector
+            )
+            withContext(Dispatchers.Main) {
+                val unsafeClient = (activity as MainActivity).parser.client
+                val dataSourceFactory = OkHttpDataSource.Factory(unsafeClient)
+                    .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36")
+                val mediaSource = DefaultMediaSourceFactory(dataSourceFactory)
+                    .createMediaSource(MediaItem.fromUri(streams.getValue("1080p")))
+                player.setMediaSource(mediaSource)
+                player.prepare()
+                player.playWhenReady = true
+            }
         }
     }
 }
