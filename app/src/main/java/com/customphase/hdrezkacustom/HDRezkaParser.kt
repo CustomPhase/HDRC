@@ -19,15 +19,17 @@ import java.util.Locale
 import javax.net.ssl.*
 
 class HDRezkaParser(val context: Context) {
+    private val SEARCH_URL = "/search/?do=search&subaction=search&q="
+    private val GET_STREAMS_URL = "/ajax/get_cdn_series/"
+    private val GET_EPISODES_URL = "/ajax/get_cdn_series/"
+    private val LOGIN_URL = "/ajax/login/"
+    private val SAVE_PROGRESS_URL = "/ajax/send_save/"
 
     private val cookieJar = object : CookieJar {
-        // Храним куки по их имени, чтобы обновлять только нужные
         private val cookieStore = mutableMapOf<String, Cookie>()
 
         override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
             cookies.forEach { cookie ->
-                // Если сервер прислал куку, которая уже просрочена (max-age=0),
-                // мы удаляем её из нашего хранилища вместо того, чтобы сохранять "deleted"
                 if (cookie.expiresAt <= System.currentTimeMillis()) {
                     cookieStore.remove(cookie.name)
                 } else {
@@ -38,7 +40,6 @@ class HDRezkaParser(val context: Context) {
 
         override fun loadForRequest(url: HttpUrl): List<Cookie> {
             val currentTime = System.currentTimeMillis()
-            // Фильтруем: только те, что подходят домену и еще не протухли
             return cookieStore.values.filter {
                 it.matches(url) && it.expiresAt > currentTime
             }
@@ -67,6 +68,7 @@ class HDRezkaParser(val context: Context) {
         }
     }
 
+    val guestClient = unsafeOkHttpClient.newBuilder().build()
     val client = unsafeOkHttpClient.newBuilder().cookieJar(cookieJar).build()
 
     private fun Request.Builder.addHDRezkaHeaders() : Request.Builder {
@@ -120,7 +122,7 @@ class HDRezkaParser(val context: Context) {
         val results = mutableListOf<SearchResult>()
 
         val encodedQuery = java.net.URLEncoder.encode(query, "utf-8")
-        val url = "${context.getString(R.string.site_url)}/search/?do=search&subaction=search&q=$encodedQuery"
+        val url = "${context.getString(R.string.site_url)}$SEARCH_URL$encodedQuery"
         val html = makeRequest(url) ?: return results
 
         val doc = Jsoup.parse(html)
@@ -236,19 +238,20 @@ class HDRezkaParser(val context: Context) {
             .build()
 
         val request = Request.Builder()
-            .url("${context.getString(R.string.site_url)}/ajax/get_cdn_series/")
+            .url("${context.getString(R.string.site_url)}$GET_STREAMS_URL")
             .post(formBody)
             .addHDRezkaHeaders()
             .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
             .build()
 
-        client.newCall(request).execute().use { response ->
+        guestClient.newCall(request).execute().use { response ->
             val body = response.body
-            if (!response.isSuccessful || body == null) {
+            val bodyString = body?.string()
+            if (!response.isSuccessful || bodyString == null) {
                 println("Request failed: error ${response.code}")
                 null
             } else {
-                val jsonObject = JSONObject(body.string())
+                val jsonObject = JSONObject(bodyString)
                 val urls = jsonObject.getString("url").toString().split(",")
                 val qualities = mutableMapOf<String, String>()
                 for (url in urls) {
@@ -272,7 +275,7 @@ class HDRezkaParser(val context: Context) {
             .build()
 
         val request = Request.Builder()
-            .url("${context.getString(R.string.site_url)}/ajax/get_cdn_series/")
+            .url("${context.getString(R.string.site_url)}$GET_EPISODES_URL")
             .post(formBody)
             .addHDRezkaHeaders()
             .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
@@ -308,19 +311,13 @@ class HDRezkaParser(val context: Context) {
             .build()
 
         val request = Request.Builder()
-            .url("${context.getString(R.string.site_url)}/ajax/login/")
+            .url("${context.getString(R.string.site_url)}$LOGIN_URL")
             .post(formBody)
             .addHDRezkaHeaders()
             .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
             .build()
 
-        client.newCall(request).execute().use { response ->
-            val body = response.body
-            println("LOGIN: ${body?.string()}")
-            if (!response.isSuccessful || body == null) {
-                println("Request failed: error ${response.code}")
-            }
-        }
+        client.newCall(request).execute()
     }
 
     suspend fun saveProgress(itemId : Int,
@@ -343,13 +340,7 @@ class HDRezkaParser(val context: Context) {
             .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
             .build()
 
-        client.newCall(request).execute().use { response ->
-            val body = response.body
-            println("SENDWATCH: response code (${response.code}). ${body?.string()}")
-            if (!response.isSuccessful || body == null) {
-                println("Request failed: error ${response.code}")
-            }
-        }
+        client.newCall(request).execute()
 
         formBody = FormBody.Builder()
             .add("post_id", itemId.toString())
@@ -361,20 +352,12 @@ class HDRezkaParser(val context: Context) {
             .build()
 
         request = Request.Builder()
-            .url("${context.getString(R.string.site_url)}/ajax/send_save/")
+            .url("${context.getString(R.string.site_url)}$SAVE_PROGRESS_URL")
             .post(formBody)
             .addHDRezkaHeaders()
             .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
             .build()
 
-        println("Cookies for request: ${client.cookieJar.loadForRequest(request.url)}")
-
-        client.newCall(request).execute().use { response ->
-            val body = response.body
-            println("SAVE: response code (${response.code}). ${body?.string()}")
-            if (!response.isSuccessful || body == null) {
-                println("Request failed: error ${response.code}")
-            }
-        }
+        client.newCall(request).execute()
     }
 }
