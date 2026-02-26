@@ -51,4 +51,6 @@ dependencies {
     implementation("com.google.android.exoplayer:exoplayer-hls:2.18.7") // Для .m3u8
     implementation("com.google.android.exoplayer:exoplayer-ui:2.18.7")   // Стандартные кнопки управления
     implementation("com.google.android.exoplayer:extension-okhttp:2.18.7")
+
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
 }

@@ -41,13 +41,13 @@ class PanelFragmentPlayer : PanelFragment() {
         player.stop()
     }
 
-    fun play(streamUrl : String) {
+    fun play(streams : Map<String, String>) {
         lifecycleScope.launch(Dispatchers.Main) {
             val unsafeClient = (activity as MainActivity).parser.client
             val dataSourceFactory = OkHttpDataSource.Factory(unsafeClient)
                 .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36")
             val mediaSource = DefaultMediaSourceFactory(dataSourceFactory)
-                .createMediaSource(MediaItem.fromUri(streamUrl))
+                .createMediaSource(MediaItem.fromUri(streams.getValue("1080p")))
             player.setMediaSource(mediaSource)
             player.prepare()
             player.playWhenReady = true

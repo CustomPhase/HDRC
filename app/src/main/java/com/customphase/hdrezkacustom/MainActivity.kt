@@ -129,8 +129,8 @@ class MainActivity : AppCompatActivity() {
         mediaPanel.loadMediaItem(url)
     }
 
-    fun showPlayerPanel(streamUrl : String) {
+    fun showPlayerPanel(streams : Map<String, String>) {
         switchToPanel(PanelFragmentPlayer::class.java, true)
-        (panels[PanelFragmentPlayer::class.java] as PanelFragmentPlayer).play(streamUrl)
+        (panels[PanelFragmentPlayer::class.java] as PanelFragmentPlayer).play(streams)
     }
 }

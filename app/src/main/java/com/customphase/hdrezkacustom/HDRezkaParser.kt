@@ -206,7 +206,7 @@ class HDRezkaParser(val context: Context) {
         seasonId : Int,
         episodeId : Int,
         isDirector : Boolean
-    ) : String? {
+    ) : Map<String, String> {
 
         val actionType = if (isMovie) "movie" else "stream"
 
@@ -229,29 +229,26 @@ class HDRezkaParser(val context: Context) {
             .addHeader("Accept", "application/json, text/javascript, */*; q=0.01")
             .build()
 
-        return try {
-            client.newCall(request).execute().use { response ->
-                val body = response.body
-                if (!response.isSuccessful || body == null) {
-                    println("Request failed: error ${response.code}")
-                    null
-                } else {
-                    val jsonObject = JSONObject(body.string())
-                    val urls = jsonObject.getString("url").toString().split(",")
-                    val qualities = mutableMapOf<String, String>()
-                    for (url in urls) {
-                        val parts = url.split(" or ")
-                        val quality = parts[0].substringAfter("[").substringBefore("]")
-                        val link = parts[0].substringAfter("]").replace("\\/", "/")
-                        qualities.put(quality, link)
-                    }
-                    qualities["1080p"]
+        client.newCall(request).execute().use { response ->
+            val body = response.body
+            if (!response.isSuccessful || body == null) {
+                println("Request failed: error ${response.code}")
+                null
+            } else {
+                val jsonObject = JSONObject(body.string())
+                val urls = jsonObject.getString("url").toString().split(",")
+                val qualities = mutableMapOf<String, String>()
+                for (url in urls) {
+                    val parts = url.split(" or ")
+                    val quality = parts[0].substringAfter("[").substringBefore("]")
+                    val link = parts[0].substringAfter("]").replace("\\/", "/")
+                    qualities[quality] = link
                 }
+                return qualities
             }
-        } catch (e: IOException) {
-            e.printStackTrace()
-            null
         }
+
+        return mapOf()
     }
 
     suspend fun getMediaEpisodes(itemId : Int, translatorId : Int) : MediaItem {

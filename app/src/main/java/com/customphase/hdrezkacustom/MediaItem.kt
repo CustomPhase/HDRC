@@ -13,7 +13,7 @@ data class MediaItem(
 data class MediaItemSelection(
     val title : String = "None",
     val active : Boolean = false,
-    val translatorId : Int,
+    var translatorId : Int,
     val seasonId : Int,
     val episodeId : Int,
     val isDirector : Boolean
