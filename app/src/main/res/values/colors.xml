@@ -2,10 +2,9 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="main_foreground">#FF973A</color>
-    <color name="main_background">#DCC6B5</color>
-    <color name="main_text">#8A431C</color>
-    <color name="main_hint_text">#735B39</color>
-    <color name="searchItemBackgroundNormal">#C8BBB1</color>
-    <color name="focused">#F8E1D4</color>
+    <color name="main_foreground">#0F1C2A</color>
+    <color name="main_background">#0C121A</color>
+    <color name="main_text">#D0723F</color>
+    <color name="main_hint_text">#735039</color>
+    <color name="focused">#0C2842</color>
 </resources>

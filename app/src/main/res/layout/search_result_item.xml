@@ -7,7 +7,7 @@
     android:background="@drawable/focusable_item_background"
     android:focusable="true"
     android:orientation="horizontal"
-    android:padding="8dp">
+    android:padding="6dp">
 
     <ImageView
         android:id="@+id/searchResultItemImage"
@@ -28,12 +28,15 @@
             android:id="@+id/searchResultItemTitle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0.8"
+            android:layout_weight="0.7"
             android:gravity="bottom"
             android:paddingTop="6dp"
             android:text="Title"
+            android:textSize="17sp"
             android:textColor="@color/main_text"
-            android:textColorHint="@color/main_hint_text" />
+            android:textColorHint="@color/main_hint_text"
+            android:ellipsize="end"
+            android:lines="1"/>
 
         <TextView
             android:id="@+id/searchResultItemInfo"
@@ -43,7 +46,7 @@
             android:gravity="top"
             android:paddingBottom="6dp"
             android:text="Info"
-            android:textColor="#B17958"
+            android:textColor="@color/main_hint_text"
             android:textSize="12sp" />
     </LinearLayout>
 

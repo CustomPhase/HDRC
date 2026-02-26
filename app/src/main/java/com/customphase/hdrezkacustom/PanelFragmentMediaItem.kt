@@ -61,7 +61,7 @@ class PanelFragmentMediaItem : PanelFragment() {
                 item.translators = listOf(
                     MediaItemSelection(
                         getString(R.string.unknown_translator),
-                        false,
+                        true,
                         item.defaultTranslatorId,
                         0,
                         0,

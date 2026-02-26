@@ -8,16 +8,18 @@
     android:focusableInTouchMode="false"
     android:orientation="vertical">
 
-    <SearchView
+    <androidx.appcompat.widget.SearchView
         android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#30FFFFFF"
+        android:background="#63000000"
         android:descendantFocusability="afterDescendants"
         android:focusable="true"
         android:focusableInTouchMode="true"
         app:theme="@style/SearchViewTheme"
-        android:queryHint="Поиск..."></SearchView>
+        app:searchIcon="@drawable/search_view_icon"
+        app:searchHintIcon="@drawable/search_view_icon"
+        android:queryHint="Поиск..."/>
 
     <include
         layout="@layout/loading_indicator"

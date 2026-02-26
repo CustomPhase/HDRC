@@ -14,12 +14,13 @@
         android:layout_marginRight="8dp"
         android:rotation="180"
         android:stateListAnimator="@animator/loading_spin"
-        android:tint="@color/main_foreground"
+        android:tint="@color/main_hint_text"
         app:srcCompat="@drawable/loading_circle" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/loading" />
+        android:text="@string/loading"
+        android:textColor="@color/main_hint_text"/>
 </LinearLayout>

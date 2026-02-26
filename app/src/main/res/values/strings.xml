@@ -3,10 +3,10 @@
     <string name="loading">Загрузка...</string>
     <string name="view_history">История просмотра:</string>
     <string name="settings">Настройки:</string>
-    <string name="translators">Выберите перевод:</string>
+    <string name="translators">Перевод:</string>
     <string name="unknown_translator">Неизвестный перевод</string>
-    <string name="seasons">Выберите сезон:</string>
-    <string name="episodes">Выберите эпизод:</string>
+    <string name="seasons">Сезон:</string>
+    <string name="episodes">Эпизод:</string>
     <string name="site_url">https://rezka.ag</string>
     <string name="exit_confirm">Нажмите еще раз чтобы выйти</string>
 </resources>

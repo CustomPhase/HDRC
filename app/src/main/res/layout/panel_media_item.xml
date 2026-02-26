@@ -2,13 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginLeft="10dp"
     android:orientation="vertical"
     android:padding="10dp">
 
     <include
-        layout="@layout/loading_indicator"
         android:id="@+id/mediaItemLoadingIndicator"
-        android:visibility="gone"/>
+        layout="@layout/loading_indicator"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/mediaItemTitle"
@@ -19,10 +20,10 @@
         android:textStyle="bold" />
 
     <LinearLayout
+        android:id="@+id/mediaItemContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:id="@+id/mediaItemContent">
+        android:orientation="horizontal">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -37,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingRight="10dp">
+                android:paddingRight="0dp">
 
                 <include
                     android:id="@+id/mediaItemTranslators"
@@ -60,7 +61,8 @@
             android:layout_weight="1.6"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ullamcorper elit eget malesuada fermentum. Duis a pulvinar mauris. Etiam ut dolor orci. Vestibulum tincidunt mi in lorem dignissim, nec volutpat magna scelerisque. Sed sagittis tincidunt enim nec pharetra. Interdum et malesuada fames ac ante ipsum primis in faucibus. Cras quis rhoncus nisi.
 
-Sed tristique sollicitudin ante. Proin eleifend ac ipsum vel dictum. Vivamus eu lectus consequat augue cursus egestas ut ut arcu. Mauris interdum ipsum lorem, vel elementum lectus vehicula ut. Sed eleifend imperdiet odio, nec venenatis lacus faucibus non. Maecenas egestas venenatis iaculis. Nam quis turpis ac metus porttitor varius quis nec tellus. Nam eget velit dolor. Pellentesque euismod risus at arcu consectetur, in consequat purus rhoncus. Aliquam euismod hendrerit bibendum. Morbi sit amet arcu sit amet erat feugiat rutrum in in odio. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Mauris et posuere quam." />
+Sed tristique sollicitudin ante. Proin eleifend ac ipsum vel dictum. Vivamus eu lectus consequat augue cursus egestas ut ut arcu. Mauris interdum ipsum lorem, vel elementum lectus vehicula ut. Sed eleifend imperdiet odio, nec venenatis lacus faucibus non. Maecenas egestas venenatis iaculis. Nam quis turpis ac metus porttitor varius quis nec tellus. Nam eget velit dolor. Pellentesque euismod risus at arcu consectetur, in consequat purus rhoncus. Aliquam euismod hendrerit bibendum. Morbi sit amet arcu sit amet erat feugiat rutrum in in odio. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Mauris et posuere quam."
+            android:textColor="@color/main_hint_text" />
 
     </LinearLayout>
 </LinearLayout>
