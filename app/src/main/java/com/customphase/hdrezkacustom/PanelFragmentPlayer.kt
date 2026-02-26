@@ -10,16 +10,15 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.ui.StyledPlayerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class PanelFragmentPlayer : PanelFragment() {
     override val iconResource: Int
-        get() = -1
+        get() = R.drawable.icon_player
     override val title: String
-        get() = ""
+        get() = "Плеер"
 
     private lateinit var player : ExoPlayer
 
@@ -37,13 +36,19 @@ class PanelFragmentPlayer : PanelFragment() {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch(Dispatchers.Main) {
             player = ExoPlayer.Builder(requireContext()).build()
-            val playerView = view.findViewById<StyledPlayerView>(R.id.playerView)
+            val playerView = view.findViewById<PlayerView>(R.id.playerView)
             playerView.player = player
         }
     }
 
+    override fun onEnable() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            view?.findViewById<View>(R.id.exoPlayPause)?.requestFocus()
+        }
+    }
+
     override fun onDisable() {
-        player.stop()
+        player.pause()
         lifecycleScope.launch {
             val pos = (player.currentPosition / 1000).toDouble()
             val dur = (player.duration / 1000).toDouble()

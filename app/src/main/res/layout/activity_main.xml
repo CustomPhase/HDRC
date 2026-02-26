@@ -7,8 +7,15 @@
 	android:orientation="horizontal"
 	tools:context=".MainActivity">
 
+	<FrameLayout
+		android:id="@+id/playerContainer"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:background="@null"
+		android:focusable="false"/>
+
 	<LinearLayout
-		android:id="@+id/navigation_container"
+		android:id="@+id/navigationContainer"
 		android:layout_width="wrap_content"
 		android:layout_height="match_parent"
 		android:layout_gravity="center"

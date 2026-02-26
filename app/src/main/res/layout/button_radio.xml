@@ -21,5 +21,6 @@
     android:ellipsize="end"
     app:backgroundTint="@null"
     app:layout_flexGrow="0"
-    app:layout_flexBasisPercent="31.2%">
+    app:layout_flexBasisPercent="31.2%"
+    android:stateListAnimator="@animator/radio_button_animator">
 </Button>

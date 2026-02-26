@@ -14,7 +14,6 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.internal.wait
 
 class MainActivity : AppCompatActivity() {
 
@@ -78,13 +77,14 @@ class MainActivity : AppCompatActivity() {
     private fun initializePanels() {
         panels[PanelFragmentHistory::class.java] = PanelFragmentHistory()
         panels[PanelFragmentSearch::class.java] = PanelFragmentSearch()
+        panels[PanelFragmentPlayer::class.java] = PanelFragmentPlayer()
         panels[PanelFragmentSettings::class.java] = PanelFragmentSettings()
         panels[PanelFragmentMediaItem::class.java] = PanelFragmentMediaItem()
-        panels[PanelFragmentPlayer::class.java] = PanelFragmentPlayer()
 
         val transaction = supportFragmentManager.beginTransaction()
         for (panel in panels.values) {
-            transaction.add(R.id.panelContainer, panel).hide(panel)
+            val parentViewId = if (panel is PanelFragmentPlayer) R.id.playerContainer else R.id.panelContainer
+            transaction.add(parentViewId, panel).hide(panel)
         }
         transaction.commit()
 
@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initializePanelsNavigation() {
-        val navigationContainer = findViewById<LinearLayout>(R.id.navigation_container)
+        val navigationContainer = findViewById<LinearLayout>(R.id.navigationContainer)
         for ((panelClass, fragment) in panels) {
             if (fragment.iconResource < 0) continue
 

@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginBottom="9dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:clipChildren="false"
+    android:clipToPadding="false">
 
     <TextView
         android:id="@+id/mediaItemSelectionsTitle"
@@ -28,5 +30,7 @@
         app:flexWrap="wrap"
         app:alignItems="flex_start"
         app:justifyContent="flex_start"
-        app:flexDirection="row"/>
+        app:flexDirection="row"
+        android:clipChildren="false"
+        android:clipToPadding="false"/>
 </com.customphase.hdrezkacustom.MediaItemSelectionsView>

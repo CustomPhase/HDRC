@@ -11,4 +11,8 @@
         <item name="android:textColor">@color/main_text</item>
         <item name="android:textSize">24sp</item>
     </style>
+
+    <style name="ExoPlayerBufferingStyle">
+        <item name="colorControlActivated">@color/main_text</item>
+    </style>
 </resources>
