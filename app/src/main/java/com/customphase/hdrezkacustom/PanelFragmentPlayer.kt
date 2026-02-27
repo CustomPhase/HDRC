@@ -48,12 +48,13 @@ class PanelFragmentPlayer : PanelFragment() {
     }
 
     override fun onDisable() {
+        if (itemId == 0) return
         player.pause()
         lifecycleScope.launch {
             val pos = (player.currentPosition / 1000).toDouble()
             val dur = (player.duration / 1000).toDouble()
             withContext(Dispatchers.IO) {
-                (activity as MainActivity).parser.saveProgress(
+                (activity as MainActivity).hdrezkaApi.saveProgress(
                     itemId,
                     translatorId,
                     seasonId,
@@ -75,7 +76,7 @@ class PanelFragmentPlayer : PanelFragment() {
         this.seasonId = seasonId
         this.episodeId = episodeId
         lifecycleScope.launch(Dispatchers.IO) {
-            val streams = (activity as MainActivity).parser.getMediaStreamUrl(
+            val streams = (activity as MainActivity).hdrezkaApi.getMediaStreamUrl(
                 itemId,
                 translatorId,
                 seasonId,
@@ -83,7 +84,7 @@ class PanelFragmentPlayer : PanelFragment() {
                 isDirector
             )
             withContext(Dispatchers.Main) {
-                val unsafeClient = (activity as MainActivity).parser.client
+                val unsafeClient = (activity as MainActivity).hdrezkaApi.client
                 val dataSourceFactory = OkHttpDataSource.Factory(unsafeClient)
                     .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36")
                 val mediaSource = DefaultMediaSourceFactory(dataSourceFactory)

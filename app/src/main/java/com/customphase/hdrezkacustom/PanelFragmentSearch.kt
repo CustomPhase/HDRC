@@ -23,7 +23,7 @@ class PanelFragmentSearch : PanelFragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var searchLoading : View
     private lateinit var adapter: SearchAdapter
-    private lateinit var parser : HDRezkaParser
+    private lateinit var parser : HDRezkaApi
     private var searchJob : Job? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -31,7 +31,7 @@ class PanelFragmentSearch : PanelFragment() {
 
         if (activity == null) return view;
         val mainActivity = (activity as MainActivity)
-        parser = mainActivity.parser
+        parser = mainActivity.hdrezkaApi
 
         searchView = view.findViewById(R.id.searchView)
         recyclerView = view.findViewById(R.id.searchRecyclerView)

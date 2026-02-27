@@ -4,10 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.children
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,7 +52,7 @@ class PanelFragmentMediaItem : PanelFragment() {
                 mediaItemLoadingIndicator.visibility = View.VISIBLE
             }
 
-            val item = (activity as MainActivity).parser.getMediaItem(url)
+            val item = (activity as MainActivity).hdrezkaApi.getMediaItem(url)
             currentItemId = item.id
             if (item.translators.isEmpty()) {
                 item.translators = listOf(
@@ -162,7 +159,7 @@ class PanelFragmentMediaItem : PanelFragment() {
                     mediaItemSeasons.startLoading()
                     mediaItemEpisodes.startLoading()
                 }
-                val item = (activity as MainActivity).parser.getMediaEpisodes(currentItemId, sel.translatorId)
+                val item = (activity as MainActivity).hdrezkaApi.getMediaEpisodes(currentItemId, sel.translatorId)
 
                 withContext(Dispatchers.Main) {
                     val selectedSeasonId = item.seasons.first { it.active }.seasonId

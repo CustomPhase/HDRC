@@ -18,7 +18,7 @@ import java.security.cert.X509Certificate
 import java.util.Locale
 import javax.net.ssl.*
 
-class HDRezkaParser(val context: Context) {
+class HDRezkaApi(val context: Context) {
     private val SEARCH_URL = "/search/?do=search&subaction=search&q="
     private val GET_STREAMS_URL = "/ajax/get_cdn_series/"
     private val GET_EPISODES_URL = "/ajax/get_cdn_series/"

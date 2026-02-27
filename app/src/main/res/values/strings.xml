@@ -8,5 +8,10 @@
     <string name="seasons">Сезон:</string>
     <string name="episodes">Эпизод:</string>
     <string name="site_url">https://rezka.ag</string>
+    <string name="delete_data">Удалить сохраненные данные</string>
+    <string name="delete_data_confirmation">Вы уверенны что хотите безвозвратно удалить все сохраненные данные?</string>
+    <string name="data_deleted">Данные удалены</string>
+    <string name="data_saved">Данные сохранены</string>
+    <string name="load_images">Загружать картинки</string>
     <string name="exit_confirm">Нажмите еще раз чтобы выйти</string>
 </resources>

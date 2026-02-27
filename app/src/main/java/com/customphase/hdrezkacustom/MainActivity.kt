@@ -24,7 +24,8 @@ class MainActivity : AppCompatActivity() {
     private var backPressedTime: Long = 0
     private var exitInterval = 2000.0
 
-    val parser by lazy { HDRezkaParser(this) }
+    val hdrezkaApi by lazy { HDRezkaApi(this) }
+    val saveDataManager by lazy {SaveDataManager(this, hdrezkaApi, lifecycleScope)}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,10 +55,12 @@ class MainActivity : AppCompatActivity() {
         })
 
         lifecycleScope.launch {
+            saveDataManager.loadSettings()
             withContext(Dispatchers.IO) {
-                parser.warmup()
-                parser.login("user", "pass")
+                hdrezkaApi.warmup()
+                hdrezkaApi.login(saveDataManager.settings.loginName, saveDataManager.settings.loginPass)
             }
+            saveDataManager.loadWatchHistory()
             initializeFocusDebug()
             initializePanels()
             switchToPanel(defaultPanel, false)

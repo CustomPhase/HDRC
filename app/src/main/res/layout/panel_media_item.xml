@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginLeft="10dp"
@@ -68,15 +69,27 @@
             </LinearLayout>
         </ScrollView>
 
-        <TextView
-            android:id="@+id/mediaItemDescription"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1.6"
-            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ullamcorper elit eget malesuada fermentum. Duis a pulvinar mauris. Etiam ut dolor orci. Vestibulum tincidunt mi in lorem dignissim, nec volutpat magna scelerisque. Sed sagittis tincidunt enim nec pharetra. Interdum et malesuada fames ac ante ipsum primis in faucibus. Cras quis rhoncus nisi.
+            android:layout_weight="1.7"
+            android:orientation="vertical">
 
-Sed tristique sollicitudin ante. Proin eleifend ac ipsum vel dictum. Vivamus eu lectus consequat augue cursus egestas ut ut arcu. Mauris interdum ipsum lorem, vel elementum lectus vehicula ut. Sed eleifend imperdiet odio, nec venenatis lacus faucibus non. Maecenas egestas venenatis iaculis. Nam quis turpis ac metus porttitor varius quis nec tellus. Nam eget velit dolor. Pellentesque euismod risus at arcu consectetur, in consequat purus rhoncus. Aliquam euismod hendrerit bibendum. Morbi sit amet arcu sit amet erat feugiat rutrum in in odio. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Mauris et posuere quam."
-            android:textColor="@color/main_hint_text" />
+            <ImageView
+                android:id="@+id/mediaItemImage"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                app:srcCompat="@android:drawable/ic_menu_help" />
+
+            <TextView
+                android:id="@+id/mediaItemDescription"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="desc"
+                android:textColor="@color/main_hint_text"
+                android:textSize="16sp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 </LinearLayout>

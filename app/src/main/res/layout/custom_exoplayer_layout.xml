@@ -4,14 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="#80000000"
+    android:background="#80040E26"
     android:gravity="center">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
 
         <ImageButton android:id="@id/exo_prev"
             style="@style/ExoMediaButton.Previous"
@@ -43,5 +45,10 @@
     <com.google.android.exoplayer2.ui.DefaultTimeBar android:id="@id/exo_progress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:played_color="@color/main_text"/>
+        app:played_color="@color/main_text"
+        app:unplayed_color="@color/main_background"
+        app:buffered_color="@color/main_foreground"
+        android:layout_marginBottom="12dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"/>
 </LinearLayout>
