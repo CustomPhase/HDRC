@@ -1,10 +1,16 @@
 package com.customphase.hdrezkacustom
 
+import android.content.Context
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +32,11 @@ class PanelFragmentSearch : PanelFragment() {
     private lateinit var parser : HDRezkaApi
     private var searchJob : Job? = null
 
+    fun View.isKeyboardVisible(): Boolean {
+        val insets = ViewCompat.getRootWindowInsets(this)
+        return insets?.isVisible(WindowInsetsCompat.Type.ime()) ?: false
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.panel_search, container, false)
 
@@ -39,18 +50,37 @@ class PanelFragmentSearch : PanelFragment() {
 
         adapter = SearchAdapter { searchResult ->
             lifecycleScope.launch(Dispatchers.IO) {
-                mainActivity.showMediaPanel(searchResult.url)
+                mainActivity.showMediaItemPanel(searchResult.url)
             }
         }
         recyclerView.layoutManager = LinearLayoutManager(view.context)
         recyclerView.adapter = adapter
 
-        // Обработка поиска
+        setupSearchViewControls()
+
+        return view
+    }
+
+    private fun setupSearchViewControls() {
+        val searchEditText = searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
+        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+        searchEditText.setOnKeyListener { v, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN &&
+                (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER)) {
+                imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT)
+                return@setOnKeyListener true
+            }
+            false
+        }
+
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                searchView.clearFocus()
-                recyclerView.post{
-                    recyclerView.findViewHolderForAdapterPosition(0)?.itemView?.requestFocus()
+                if (searchEditText.isKeyboardVisible()) {
+                    searchView.clearFocus()
+                    recyclerView.requestFocus()
+                } else {
+                    imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT)
                 }
                 return true
             }
@@ -62,8 +92,6 @@ class PanelFragmentSearch : PanelFragment() {
                 return false
             }
         })
-
-        return view
     }
 
     private fun performSearch(query: String) {

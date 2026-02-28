@@ -16,6 +16,7 @@
         android:descendantFocusability="afterDescendants"
         android:focusable="true"
         android:focusableInTouchMode="true"
+        app:iconifiedByDefault="false"
         app:theme="@style/SearchViewTheme"
         app:searchIcon="@drawable/search_view_icon"
         app:searchHintIcon="@drawable/search_view_icon"

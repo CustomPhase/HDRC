@@ -145,11 +145,13 @@ class PanelFragmentMediaItem : PanelFragment() {
         if (isMovie) {
             lifecycleScope.launch(Dispatchers.IO) {
                 (activity as MainActivity).showPlayerPanel(
+                    mediaItemTitle.text.toString(),
                     currentItemId,
                     sel.translatorId,
                     0,
                     0,
-                    sel.isDirector
+                    sel.isDirector,
+                    0
                 )
             }
         } else {
@@ -202,11 +204,13 @@ class PanelFragmentMediaItem : PanelFragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             val sel = btn.tag as MediaItemSelection
             (activity as MainActivity).showPlayerPanel(
+                title,
                 currentItemId,
                 translatorId,
                 sel.seasonId,
                 sel.episodeId,
-                false
+                false,
+                0
             )
         }
     }

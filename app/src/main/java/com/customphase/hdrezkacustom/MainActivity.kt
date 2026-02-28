@@ -15,6 +15,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+fun getMediaInfoAsString(seasonId : Int, episodeId : Int) : String {
+    return (if (seasonId > 0) " ($seasonId сезон" else "") +
+            (if (episodeId > 0) ", $episodeId эпизод)" else "");
+}
+
 class MainActivity : AppCompatActivity() {
 
     private val panels = mutableMapOf<Class<out PanelFragment>, PanelFragment>()
@@ -130,24 +135,28 @@ class MainActivity : AppCompatActivity() {
         currentPanel = targetPanel
     }
 
-    fun showMediaPanel(url: String) {
+    fun showMediaItemPanel(url: String) {
         switchToPanel(PanelFragmentMediaItem::class.java, true)
-        val mediaPanel = panels[PanelFragmentMediaItem::class.java] as PanelFragmentMediaItem
-        mediaPanel.loadMediaItem(url)
+        val mediaItemPanel = panels[PanelFragmentMediaItem::class.java] as PanelFragmentMediaItem
+        mediaItemPanel.loadMediaItem(url)
     }
 
-    fun showPlayerPanel(itemId : Int,
+    fun showPlayerPanel(itemTitle : String,
+                        itemId : Int,
                         translatorId : Int,
                         seasonId : Int,
                         episodeId : Int,
-                        isDirector : Boolean) {
+                        isDirector : Boolean,
+                        startTime : Long) {
         switchToPanel(PanelFragmentPlayer::class.java, true)
         (panels[PanelFragmentPlayer::class.java] as PanelFragmentPlayer).play(
+            itemTitle,
             itemId,
             translatorId,
             seasonId,
             episodeId,
-            isDirector
+            isDirector,
+            startTime
         )
     }
 }
