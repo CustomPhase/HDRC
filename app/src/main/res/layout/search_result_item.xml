@@ -29,14 +29,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="0.7"
+            android:ellipsize="end"
             android:gravity="bottom"
-            android:paddingTop="6dp"
+            android:lines="1"
+            android:paddingTop="3dp"
             android:text="Title"
-            android:textSize="17sp"
             android:textColor="@color/main_text"
             android:textColorHint="@color/main_hint_text"
-            android:ellipsize="end"
-            android:lines="1"/>
+            android:textSize="19sp" />
 
         <TextView
             android:id="@+id/searchResultItemInfo"
@@ -47,7 +47,7 @@
             android:paddingBottom="6dp"
             android:text="Info"
             android:textColor="@color/main_hint_text"
-            android:textSize="12sp" />
+            android:textSize="13sp" />
     </LinearLayout>
 
 </LinearLayout>

@@ -204,7 +204,7 @@ class PanelFragmentMediaItem : PanelFragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             val sel = btn.tag as MediaItemSelection
             (activity as MainActivity).showPlayerPanel(
-                title,
+                mediaItemTitle.text.toString(),
                 currentItemId,
                 translatorId,
                 sel.seasonId,
