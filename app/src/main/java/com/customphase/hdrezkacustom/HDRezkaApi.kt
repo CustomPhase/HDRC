@@ -9,8 +9,6 @@ import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Dns
-import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.dnsoverhttps.DnsOverHttps
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -23,11 +21,7 @@ import javax.net.ssl.TrustManager
 import java.security.cert.X509Certificate
 import java.util.Locale
 import javax.net.ssl.*
-import java.net.ProxySelector
-import java.net.SocketAddress
-import java.net.URI
 import java.net.InetAddress
-import java.net.Inet4Address
 import java.net.Socket
 import javax.net.SocketFactory
 
@@ -37,18 +31,6 @@ class HDRezkaApi(val context: Context) {
     private val GET_EPISODES_URL = "/ajax/get_cdn_series/"
     private val LOGIN_URL = "/ajax/login/"
     private val SAVE_PROGRESS_URL = "/ajax/send_save/"
-
-    private val isolatedDnsClient = OkHttpClient.Builder()
-        .proxy(Proxy.NO_PROXY)
-        .socketFactory(SocketFactory.getDefault()) // Явно стандартные сокеты
-        .dns(Dns.SYSTEM) // Явно системный DNS для самого DoH
-        .build()
-
-    private val secureDns = DnsOverHttps.Builder()
-        .client(isolatedDnsClient)
-        .url("https://1.1.1.1".toHttpUrl())
-        .bootstrapDnsHosts(listOf(InetAddress.getByName("1.1.1.1")))
-        .build()
 
     class SocksProxySocketFactory(
         private val proxyHost: String,
@@ -114,17 +96,17 @@ class HDRezkaApi(val context: Context) {
             val sslContext = SSLContext.getInstance("TLS")
             sslContext.init(null, trustAllCerts, SecureRandom())
 
-            /*val myDns = object : Dns {
+            val myDns = object : Dns {
                 override fun lookup(hostname: String): List<InetAddress> {
                     val addr = Dns.SYSTEM.lookup(hostname)
-                    //Log.e("DNS_CHECK", "OkHttp DNS: $hostname -> ${addr.first()}")
+                    Log.e("DNS_CHECK", "OkHttp DNS: $hostname -> ${addr.first()}")
                     return addr
                 }
-            }*/
+            }
 
             OkHttpClient.Builder()
-                .socketFactory(SocksProxySocketFactory("127.0.0.1", 1080, secureDns))
-                .dns(secureDns)
+                .socketFactory(SocksProxySocketFactory(BYEDPI_PROXY_ADDRESS, BYEDPI_PROXY_PORT, myDns))
+                .dns(myDns)
                 .sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
                 .hostnameVerifier { _, _ -> true } // любой hostname
                 .followRedirects(true)

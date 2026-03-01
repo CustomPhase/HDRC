@@ -16,6 +16,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.system.exitProcess
 
+const val BYEDPI_PROXY_ADDRESS = "127.0.0.1"
+const val BYEDPI_PROXY_PORT = 1080
+
+
 fun getMediaInfoAsString(seasonId : Int, episodeId : Int) : String {
     return (if (seasonId > 0) " ($seasonId сезон" else "") +
             (if (episodeId > 0) ", $episodeId эпизод)" else "");
@@ -50,7 +54,7 @@ class MainActivity : AppCompatActivity() {
                     switchToPanel(panelHistory.pop(), false)
                 } else {
                     if (System.currentTimeMillis() - backPressedTime < exitInterval) {
-                        //byeDpiManager.stop()
+                        byeDpiManager.stop()
                         finishAffinity()
                         exitProcess(0)
                     } else {
@@ -74,6 +78,11 @@ class MainActivity : AppCompatActivity() {
             initializePanels()
             switchToPanel(defaultPanel, false)
         }
+    }
+
+    override fun onDestroy() {
+        byeDpiManager.stop()
+        super.onDestroy()
     }
 
     private fun initializeFocusDebug() {
