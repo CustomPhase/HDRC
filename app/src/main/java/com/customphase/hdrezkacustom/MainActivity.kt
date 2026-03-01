@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.system.exitProcess
 
 fun getMediaInfoAsString(seasonId : Int, episodeId : Int) : String {
     return (if (seasonId > 0) " ($seasonId сезон" else "") +
@@ -48,8 +49,8 @@ class MainActivity : AppCompatActivity() {
                     switchToPanel(panelHistory.pop(), false)
                 } else {
                     if (System.currentTimeMillis() - backPressedTime < exitInterval) {
-                        // Exit the app on the second back press within the interval
-                        finish()
+                        finishAffinity()
+                        exitProcess(0)
                     } else {
                         // Show a toast message on the first back press
                         Toast.makeText(this@MainActivity, getString(R.string.exit_confirm), Toast.LENGTH_SHORT).show()
