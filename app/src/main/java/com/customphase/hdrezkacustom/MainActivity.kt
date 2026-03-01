@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
 
     val hdrezkaApi by lazy { HDRezkaApi(this) }
     val saveDataManager by lazy {SaveDataManager(this, hdrezkaApi, lifecycleScope)}
+    val byeDpiManager = ByeDpiManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +50,7 @@ class MainActivity : AppCompatActivity() {
                     switchToPanel(panelHistory.pop(), false)
                 } else {
                     if (System.currentTimeMillis() - backPressedTime < exitInterval) {
+                        //byeDpiManager.stop()
                         finishAffinity()
                         exitProcess(0)
                     } else {
@@ -61,6 +63,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         lifecycleScope.launch {
+            byeDpiManager.start(this@MainActivity)
             saveDataManager.loadSettings()
             withContext(Dispatchers.IO) {
                 hdrezkaApi.warmup()

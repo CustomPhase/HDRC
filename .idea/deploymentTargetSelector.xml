@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="HDRC">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-02-26T08:13:59.832468900Z">
+        <DropdownSelection timestamp="2026-03-01T20:22:49.947803Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\CustomPhase\.android\avd\Television_1080p.avd" />

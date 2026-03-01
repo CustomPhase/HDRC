@@ -1,22 +1,35 @@
 package com.customphase.hdrezkacustom
 
 import android.content.Context
+import android.util.Log
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.FormBody
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Dns
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.dnsoverhttps.DnsOverHttps
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.io.IOException
+import java.net.InetSocketAddress
+import java.net.Proxy
 import java.security.SecureRandom
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import java.security.cert.X509Certificate
 import java.util.Locale
 import javax.net.ssl.*
+import java.net.ProxySelector
+import java.net.SocketAddress
+import java.net.URI
+import java.net.InetAddress
+import java.net.Inet4Address
+import java.net.Socket
+import javax.net.SocketFactory
 
 class HDRezkaApi(val context: Context) {
     private val SEARCH_URL = "/search/?do=search&subaction=search&q="
@@ -24,6 +37,49 @@ class HDRezkaApi(val context: Context) {
     private val GET_EPISODES_URL = "/ajax/get_cdn_series/"
     private val LOGIN_URL = "/ajax/login/"
     private val SAVE_PROGRESS_URL = "/ajax/send_save/"
+
+    private val isolatedDnsClient = OkHttpClient.Builder()
+        .proxy(Proxy.NO_PROXY)
+        .socketFactory(SocketFactory.getDefault()) // Явно стандартные сокеты
+        .dns(Dns.SYSTEM) // Явно системный DNS для самого DoH
+        .build()
+
+    private val secureDns = DnsOverHttps.Builder()
+        .client(isolatedDnsClient)
+        .url("https://1.1.1.1".toHttpUrl())
+        .bootstrapDnsHosts(listOf(InetAddress.getByName("1.1.1.1")))
+        .build()
+
+    class SocksProxySocketFactory(
+        private val proxyHost: String,
+        private val proxyPort: Int,
+        private val dns: Dns
+    ) : SocketFactory() {
+
+        override fun createSocket(): Socket {
+            // Создаем сокет с привязкой к прокси
+            val proxy = Proxy(Proxy.Type.SOCKS, InetSocketAddress(proxyHost, proxyPort))
+            return Socket(proxy)
+        }
+
+        override fun createSocket(host: String, port: Int): Socket {
+            // 1. ВРУЧНУЮ резолвим через переданный DNS (теперь лог появится!)
+            val addresses = dns.lookup(host)
+            val resolvedIp = addresses.first().hostAddress
+
+            Log.e("DNS_CHECK", "Manual resolve: $host -> $resolvedIp")
+
+            val socket = createSocket()
+            // 2. Подключаемся к прокси, передавая уже IP, а не имя хоста
+            socket.connect(InetSocketAddress(resolvedIp, port))
+            return socket
+        }
+
+        // Эти методы OkHttp обычно не использует для HTTP-запросов, но их нужно реализовать
+        override fun createSocket(host: String, port: Int, localHost: InetAddress?, localPort: Int) = createSocket(host, port)
+        override fun createSocket(address: InetAddress, port: Int) = createSocket().apply { connect(InetSocketAddress(address, port)) }
+        override fun createSocket(address: InetAddress, port: Int, localAddress: InetAddress?, localPort: Int) = createSocket(address, port)
+    }
 
     private val cookieJar = object : CookieJar {
         private val cookieStore = mutableMapOf<String, Cookie>()
@@ -58,13 +114,24 @@ class HDRezkaApi(val context: Context) {
             val sslContext = SSLContext.getInstance("TLS")
             sslContext.init(null, trustAllCerts, SecureRandom())
 
+            /*val myDns = object : Dns {
+                override fun lookup(hostname: String): List<InetAddress> {
+                    val addr = Dns.SYSTEM.lookup(hostname)
+                    //Log.e("DNS_CHECK", "OkHttp DNS: $hostname -> ${addr.first()}")
+                    return addr
+                }
+            }*/
+
             OkHttpClient.Builder()
+                .socketFactory(SocksProxySocketFactory("127.0.0.1", 1080, secureDns))
+                .dns(secureDns)
                 .sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
                 .hostnameVerifier { _, _ -> true } // любой hostname
                 .followRedirects(true)
                 .build()
-        } catch (e: Exception) {
-            throw RuntimeException(e)
+        } catch (e: Throwable) { // Используйте Throwable вместо Exception
+            Log.e("CRASH_DEBUG", "Ошибка инициализации клиента", e)
+            throw e
         }
     }
 
