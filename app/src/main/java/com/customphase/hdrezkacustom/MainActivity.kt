@@ -2,6 +2,7 @@ package com.customphase.hdrezkacustom
 
 import android.content.Context
 import android.os.Bundle
+import android.view.KeyEvent
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -135,6 +136,15 @@ class MainActivity : AppCompatActivity() {
         transaction.commit()
 
         initializePanelsNavigation()
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_DOWN) {
+            if (currentPanel is PanelFragmentPlayer) {
+                if ((currentPanel as PanelFragmentPlayer).handleInput(event.keyCode)) return true
+            }
+        }
+        return super.dispatchKeyEvent(event)
     }
 
     private fun initializePanelsNavigation() {

@@ -1,6 +1,7 @@
 package com.customphase.hdrezkacustom
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.children
 import androidx.lifecycle.lifecycleScope
+import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -16,6 +18,7 @@ import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import com.google.android.exoplayer2.ui.PlayerView
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -36,8 +39,11 @@ class PanelFragmentPlayer : PanelFragment() {
 
     private val speeds = arrayOf(0.5, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 2.0)
 
+    private lateinit var playerView : PlayerView
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.panel_player, container, false)
+        playerView = view.findViewById(R.id.playerView)
         return view
     }
 
@@ -50,8 +56,9 @@ class PanelFragmentPlayer : PanelFragment() {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch(Dispatchers.Main) {
             player = ExoPlayer.Builder(requireContext()).build()
-            val playerView = view.findViewById<PlayerView>(R.id.playerView)
             playerView.player = player
+            playerView.useController = true
+            playerView.controllerAutoShow = false
 
             player.addListener(object : Player.Listener {
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -90,7 +97,8 @@ class PanelFragmentPlayer : PanelFragment() {
     override fun onEnable() {
         lifecycleScope.launch(Dispatchers.Main) {
             (activity as MainActivity).findViewById<View>(R.id.navigationContainer).visibility = View.GONE
-            view?.findViewById<View>(R.id.exoPlayPause)?.requestFocus()
+            playerView.requestFocus()
+            playerView.hideController()
         }
     }
 
@@ -99,6 +107,45 @@ class PanelFragmentPlayer : PanelFragment() {
         if (itemId == 0) return
         player.pause()
         saveToWatchHistory()
+    }
+
+    fun handleInput(keyCode : Int) : Boolean {
+        if (playerView.isControllerVisible) return false
+        return when (keyCode) {
+            KeyEvent.KEYCODE_DPAD_LEFT -> {
+                seekRelative(-10000)
+                true
+            }
+            KeyEvent.KEYCODE_DPAD_RIGHT -> {
+                seekRelative(10000)
+                true
+            }
+            /*KeyEvent.KEYCODE_DPAD_CENTER -> {
+                playerView.useController = true
+                playerView.showController()
+                true
+            }*/
+            else -> {
+                playerView.useController = true
+                false
+            }
+        }
+    }
+
+    fun seekRelative(offsetMs: Long) {
+        val newPosition = player.currentPosition + offsetMs
+        val duration = player.duration
+        val targetPosition = if (duration != C.TIME_UNSET) {
+            newPosition.coerceIn(0, duration)
+        } else {
+            newPosition.coerceAtLeast(0)
+        }
+        playerView.useController = false
+        player.seekTo(targetPosition)
+        lifecycleScope.launch {
+            delay(16)
+            playerView.useController = true
+        }
     }
 
     private fun saveToWatchHistory() {
