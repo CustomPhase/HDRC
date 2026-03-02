@@ -104,13 +104,15 @@ class HDRezkaApi(val context: Context) {
                 }
             }
 
-            OkHttpClient.Builder()
-                .socketFactory(SocksProxySocketFactory(BYEDPI_PROXY_ADDRESS, BYEDPI_PROXY_PORT, myDns))
-                .dns(myDns)
-                .sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
-                .hostnameVerifier { _, _ -> true } // любой hostname
-                .followRedirects(true)
-                .build()
+            val builder = OkHttpClient.Builder()
+            if (byeDpiStarted)  {
+                builder.socketFactory(SocksProxySocketFactory(BYEDPI_PROXY_ADDRESS, BYEDPI_PROXY_PORT, myDns))
+                builder.dns(myDns)
+            }
+            builder.sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
+                    .hostnameVerifier { _, _ -> true } // любой hostname
+                    .followRedirects(true)
+                    .build()
         } catch (e: Throwable) { // Используйте Throwable вместо Exception
             Log.e("CRASH_DEBUG", "Ошибка инициализации клиента", e)
             throw e
@@ -227,9 +229,12 @@ class HDRezkaApi(val context: Context) {
         val id = initCdn?.groupValues[1]?.toInt() ?: 0
         val defaultTranslatorId = initCdn?.groupValues[2]?.toInt() ?: 0
 
+        val imageUrl = doc.selectFirst("div.b-sidecover img")?.attr("src").toString()
+
         return MediaItem(
             id = id,
             title = title,
+            imageUrl = imageUrl,
             description = description,
             defaultTranslatorId = defaultTranslatorId,
             translators = parseMediaSelections(doc, ".b-translator__item"),
@@ -341,6 +346,7 @@ class HDRezkaApi(val context: Context) {
                 val episodesDoc = Jsoup.parse(jsonObject.getString("episodes"))
                 return MediaItem(
                     itemId,
+                    "",
                     "",
                     "",
                     0,

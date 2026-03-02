@@ -9,13 +9,22 @@
     android:orientation="horizontal"
     android:padding="6dp">
 
-    <ImageView
-        android:id="@+id/searchResultItemImage"
+    <FrameLayout
         android:layout_width="60dp"
-        android:layout_height="match_parent"
+        android:layout_height="68dp"
+        android:layout_marginRight="5dp"
         android:layout_weight="0"
-        android:scaleType="fitCenter"
-        app:srcCompat="@android:drawable/ic_menu_help" />
+        android:layout_gravity="center">
+
+        <ImageView
+            android:id="@+id/searchResultItemImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            app:srcCompat="@android:drawable/ic_menu_help" />
+
+    </FrameLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,7 +37,7 @@
             android:id="@+id/searchResultItemTitle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0.7"
+            android:layout_weight="0.9"
             android:ellipsize="end"
             android:gravity="bottom"
             android:lines="1"

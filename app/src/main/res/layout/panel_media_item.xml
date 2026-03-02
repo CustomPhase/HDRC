@@ -3,93 +3,101 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="10dp"
-    android:orientation="vertical"
-    android:padding="10dp"
-    android:clipChildren="false"
-    android:clipToPadding="false">
-
-    <include
-        android:id="@+id/mediaItemLoadingIndicator"
-        layout="@layout/loading_indicator"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/mediaItemTitle"
-        style="@style/PanelHeader"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Загрузка..."
-        android:textStyle="bold" />
+    android:orientation="horizontal">
 
     <LinearLayout
-        android:id="@+id/mediaItemContent"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:clipChildren="false"
-        android:clipToPadding="false">
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingTop="10dp"
+        android:paddingRight="4dp"
+        android:paddingBottom="10dp">
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="15dp"
-            android:layout_marginBottom="10dp"
-            android:layout_weight="1"
-            android:fadingEdgeLength="48dp"
-            android:requiresFadingEdge="vertical"
-            android:clipChildren="false"
-            android:clipToPadding="false">
+        <include
+            android:id="@+id/mediaItemLoadingIndicator"
+            layout="@layout/loading_indicator"
+            android:visibility="gone" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingRight="0dp"
-                android:clipChildren="false"
-                android:clipToPadding="false">
-
-                <include
-                    android:id="@+id/mediaItemTranslators"
-                    layout="@layout/media_item_selections"
-                    android:clipChildren="false"
-                    android:clipToPadding="false"/>
-
-                <include
-                    android:id="@+id/mediaItemSeasons"
-                    layout="@layout/media_item_selections"
-                    android:clipChildren="false"
-                    android:clipToPadding="false"/>
-
-                <include
-                    android:id="@+id/mediaItemEpisodes"
-                    layout="@layout/media_item_selections"
-                    android:clipChildren="false"
-                    android:clipToPadding="false"/>
-            </LinearLayout>
-        </ScrollView>
-
-        <LinearLayout
+        <TextView
+            android:id="@+id/mediaItemTitle"
+            style="@style/PanelHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1.7"
-            android:orientation="vertical">
+            android:paddingLeft="20dp"
+            android:text="Загрузка..."
+            android:textStyle="bold" />
 
-            <ImageView
-                android:id="@+id/mediaItemImage"
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                app:srcCompat="@android:drawable/ic_menu_help" />
+        <LinearLayout
+            android:id="@+id/mediaItemContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="true"
+            android:clipToPadding="false"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/mediaItemDescription"
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="desc"
-                android:textColor="@color/main_hint_text"
-                android:textSize="16sp" />
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_weight="1"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:fadingEdgeLength="48dp"
+                android:paddingLeft="20dp"
+                android:requiresFadingEdge="vertical">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/mediaItemTranslators"
+                        layout="@layout/media_item_selections"
+                        android:clipChildren="false"
+                        android:clipToPadding="false" />
+
+                    <include
+                        android:id="@+id/mediaItemSeasons"
+                        layout="@layout/media_item_selections"
+                        android:clipChildren="false"
+                        android:clipToPadding="false" />
+
+                    <include
+                        android:id="@+id/mediaItemEpisodes"
+                        layout="@layout/media_item_selections"
+                        android:clipChildren="false"
+                        android:clipToPadding="false" />
+                </LinearLayout>
+            </ScrollView>
         </LinearLayout>
+    </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/mediaItemInfo"
+        android:layout_width="250dp"
+        android:layout_height="match_parent"
+        android:background="@color/main_foreground"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/mediaItemImage"
+            android:layout_width="match_parent"
+            android:layout_height="270dp"
+            android:background="@color/black"
+            app:srcCompat="@android:drawable/ic_menu_help" />
+
+        <TextView
+            android:id="@+id/mediaItemDescription"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:justificationMode="inter_word"
+            android:padding="9dp"
+            android:textColor="@color/main_hint_text"
+            android:textSize="16sp" />
     </LinearLayout>
 </LinearLayout>

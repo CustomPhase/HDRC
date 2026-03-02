@@ -37,25 +37,12 @@ class SearchAdapter(private val onItemClick: (SearchResult) -> Unit) :
         //private val description: TextView = itemView.findViewById(R.id.descriptionTextView)
         private val info: TextView = itemView.findViewById(R.id.searchResultItemInfo)
 
-        init {
-            itemView.setOnClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    // здесь надо передать объект, но мы используем колбэк, поэтому передадим в bind
-                }
-            }
-        }
-
         fun bind(result: SearchResult) {
             title.text = result.title
             info.text = result.info
-            //description.text = result.description ?: "Описание отсутствует"
 
-            // Загрузка постера (пока без Glide, можно просто показать заглушку)
-            if (result.imageUrl != null) {
-                // Здесь можно использовать Glide или Picasso, но для простоты оставим пустым
-                // Например:
-                // Glide.with(itemView.context).load(result.posterUrl).into(poster)
+            if (result.imageUrl != null && settings.loadImages) {
+                loadImageFromUrlIntoView(image, result.imageUrl)
             }
 
             itemView.setOnClickListener {

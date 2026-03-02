@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
@@ -20,8 +21,10 @@ class PanelFragmentMediaItem : PanelFragment() {
         get() = ""
 
     private lateinit var mediaItemTitle : TextView
+    private lateinit var mediaItemImage : ImageView
     private lateinit var mediaItemDescription : TextView
     private lateinit var mediaItemContent : View
+    private lateinit var mediaItemInfo : View
     private lateinit var mediaItemTranslators : MediaItemSelectionsView
     private lateinit var mediaItemSeasons : MediaItemSelectionsView
     private lateinit var mediaItemEpisodes : MediaItemSelectionsView
@@ -30,8 +33,10 @@ class PanelFragmentMediaItem : PanelFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.panel_media_item, container, false)
         mediaItemTitle = view.findViewById(R.id.mediaItemTitle)
+        mediaItemImage = view.findViewById(R.id.mediaItemImage)
         mediaItemDescription = view.findViewById(R.id.mediaItemDescription)
         mediaItemContent = view.findViewById(R.id.mediaItemContent)
+        mediaItemInfo = view.findViewById(R.id.mediaItemInfo)
         mediaItemTranslators = view.findViewById(R.id.mediaItemTranslators)
         mediaItemSeasons = view.findViewById(R.id.mediaItemSeasons)
         mediaItemEpisodes = view.findViewById(R.id.mediaItemEpisodes)
@@ -48,6 +53,7 @@ class PanelFragmentMediaItem : PanelFragment() {
                 mediaItemTranslators.visibility = View.GONE
                 mediaItemSeasons.visibility = View.GONE
                 mediaItemEpisodes.visibility = View.GONE
+                mediaItemInfo.visibility = View.GONE
 
                 mediaItemLoadingIndicator.visibility = View.VISIBLE
             }
@@ -74,9 +80,12 @@ class PanelFragmentMediaItem : PanelFragment() {
             withContext(Dispatchers.Main) {
                 mediaItemLoadingIndicator.visibility = View.GONE
                 mediaItemContent.visibility = View.VISIBLE
+                mediaItemInfo.visibility = View.VISIBLE
 
                 mediaItemTitle.text = item.title
                 mediaItemDescription.text = item.description
+
+                loadImageFromUrlIntoView(mediaItemImage, item.imageUrl)
 
                 createMediaSelections(
                     R.id.mediaItemTranslators,

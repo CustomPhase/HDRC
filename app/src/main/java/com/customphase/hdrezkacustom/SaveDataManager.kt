@@ -23,7 +23,6 @@ class SaveDataManager(val context: Context, val hdrezkaApi : HDRezkaApi, val sco
     private var saveWatchHistoryJob : Job? = null
 
     val gson = Gson()
-    var settings = Settings()
     private var watchHistory = WatchHistory()
 
     suspend fun loadSettings() {

@@ -26,21 +26,21 @@ class PanelFragmentSettings : PanelFragment() {
         val saveDataManager = (activity as MainActivity).saveDataManager
 
         lifecycleScope.launch {
-            val name = saveDataManager.settings.loginName
+            val name = settings.loginName
             loginNameField.setText(name)
             loginNameField.setSelection(name.length)
 
-            val pass = saveDataManager.settings.loginPass
+            val pass = settings.loginPass
             loginPassField.setText(pass)
             loginPassField.setSelection(pass.length)
         }
 
         loginNameField.addTextChangedListener {
-            saveDataManager.settings.loginName = it.toString()
+            settings.loginName = it.toString()
         }
 
         loginPassField.addTextChangedListener {
-            saveDataManager.settings.loginPass = it.toString()
+            settings.loginPass = it.toString()
         }
 
         deleteDataButton.setOnClickListener {

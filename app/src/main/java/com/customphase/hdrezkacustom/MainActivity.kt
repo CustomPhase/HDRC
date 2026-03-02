@@ -1,5 +1,6 @@
 package com.customphase.hdrezkacustom
 
+import android.content.Context
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -8,10 +9,13 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.system.exitProcess
@@ -19,10 +23,20 @@ import kotlin.system.exitProcess
 const val BYEDPI_PROXY_ADDRESS = "127.0.0.1"
 const val BYEDPI_PROXY_PORT = 1080
 
+var byeDpiStarted = false
+
+var settings = Settings()
 
 fun getMediaInfoAsString(seasonId : Int, episodeId : Int) : String {
     return (if (seasonId > 0) " ($seasonId сезон" else "") +
             (if (episodeId > 0) ", $episodeId эпизод)" else "");
+}
+
+fun loadImageFromUrlIntoView(target : ImageView, url : String) {
+    Glide.with(target.context)
+        .load(url)
+        .error(android.R.drawable.ic_menu_help)
+        .into(target)
 }
 
 class MainActivity : AppCompatActivity() {
@@ -58,6 +72,7 @@ class MainActivity : AppCompatActivity() {
                         finishAffinity()
                         exitProcess(0)
                     } else {
+                        clearGlideCache(this@MainActivity)
                         // Show a toast message on the first back press
                         Toast.makeText(this@MainActivity, getString(R.string.exit_confirm), Toast.LENGTH_SHORT).show()
                         backPressedTime = System.currentTimeMillis()
@@ -71,7 +86,7 @@ class MainActivity : AppCompatActivity() {
             saveDataManager.loadSettings()
             withContext(Dispatchers.IO) {
                 hdrezkaApi.warmup()
-                hdrezkaApi.login(saveDataManager.settings.loginName, saveDataManager.settings.loginPass)
+                hdrezkaApi.login(settings.loginName, settings.loginPass)
             }
             saveDataManager.loadWatchHistory()
             initializeFocusDebug()
@@ -83,16 +98,26 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         byeDpiManager.stop()
         super.onDestroy()
+        clearGlideCache(this)
+    }
+
+    fun clearGlideCache(context: Context) {
+        // Clear memory cache (must be called on the main thread)
+        Glide.get(context).clearMemory()
+        // Clear disk cache (must be called on a background/worker thread)
+        GlobalScope.launch(Dispatchers.IO) {
+            Glide.get(context).clearDiskCache()
+        }
     }
 
     private fun initializeFocusDebug() {
-        window.decorView.viewTreeObserver.addOnGlobalFocusChangeListener { oldFocus, newFocus ->
+        /*window.decorView.viewTreeObserver.addOnGlobalFocusChangeListener { oldFocus, newFocus ->
             var oldName = "none"
             var newName = "none"
             if (oldFocus != null && oldFocus.id >= 0) oldName = resources.getResourceEntryName(oldFocus.id)
             if (newFocus != null && newFocus.id >= 0) newName = resources.getResourceEntryName(newFocus.id)
             println("FOCUS_CHANGE: Focus moved from $oldName to $newName")
-        }
+        }*/
     }
 
     private fun initializePanels() {

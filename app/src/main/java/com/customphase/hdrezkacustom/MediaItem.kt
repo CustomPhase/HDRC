@@ -2,6 +2,7 @@ package com.customphase.hdrezkacustom
 
 data class MediaItem(
     val id : Int = 0,
+    val imageUrl : String = "",
     val title : String = "None",
     val description : String = "None",
     val defaultTranslatorId : Int = 0,
