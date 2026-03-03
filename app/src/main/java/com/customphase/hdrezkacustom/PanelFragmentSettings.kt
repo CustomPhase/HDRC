@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ToggleButton
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -20,10 +21,16 @@ class PanelFragmentSettings : PanelFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.panel_settings, container, false)
 
+        val loadImages = view.findViewById<ToggleButton>(R.id.loadImages)
         val loginNameField = view.findViewById<EditText>(R.id.loginNameField)
         val loginPassField = view.findViewById<EditText>(R.id.loginPassField)
         val deleteDataButton = view.findViewById<Button>(R.id.deleteDataButton)
         val saveDataManager = (activity as MainActivity).saveDataManager
+
+        loadImages.isChecked = settings.loadImages
+        loadImages.setOnClickListener {
+            settings.loadImages = loadImages.isChecked
+        }
 
         lifecycleScope.launch {
             val name = settings.loginName

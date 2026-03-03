@@ -34,6 +34,7 @@ fun getMediaInfoAsString(seasonId : Int, episodeId : Int) : String {
 }
 
 fun loadImageFromUrlIntoView(target : ImageView, url : String) {
+    if (!settings.loadImages) return
     Glide.with(target.context)
         .load(url)
         .error(android.R.drawable.ic_menu_help)

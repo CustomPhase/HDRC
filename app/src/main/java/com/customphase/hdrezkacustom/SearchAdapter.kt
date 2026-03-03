@@ -41,7 +41,7 @@ class SearchAdapter(private val onItemClick: (SearchResult) -> Unit) :
             title.text = result.title
             info.text = result.info
 
-            if (result.imageUrl != null && settings.loadImages) {
+            if (result.imageUrl != null) {
                 loadImageFromUrlIntoView(image, result.imageUrl)
             }
 
