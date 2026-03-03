@@ -74,7 +74,6 @@ class MainActivity : AppCompatActivity() {
                         exitProcess(0)
                     } else {
                         clearGlideCache(this@MainActivity)
-                        // Show a toast message on the first back press
                         Toast.makeText(this@MainActivity, getString(R.string.exit_confirm), Toast.LENGTH_SHORT).show()
                         backPressedTime = System.currentTimeMillis()
                     }
@@ -103,9 +102,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun clearGlideCache(context: Context) {
-        // Clear memory cache (must be called on the main thread)
         Glide.get(context).clearMemory()
-        // Clear disk cache (must be called on a background/worker thread)
         GlobalScope.launch(Dispatchers.IO) {
             Glide.get(context).clearDiskCache()
         }

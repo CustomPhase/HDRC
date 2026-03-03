@@ -120,11 +120,6 @@ class PanelFragmentPlayer : PanelFragment() {
                 seekRelative(10000)
                 true
             }
-            /*KeyEvent.KEYCODE_DPAD_CENTER -> {
-                playerView.useController = true
-                playerView.showController()
-                true
-            }*/
             else -> {
                 playerView.useController = true
                 false

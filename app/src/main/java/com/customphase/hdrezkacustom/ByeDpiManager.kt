@@ -28,7 +28,6 @@ class ByeDpiManager {
         val binFile = File(nativeDir, "libbyedpi.so")
 
         val args = "-H:rezka.ag -s1 -q1 -r1+s -a1 -Ar -o1 -a1 -At -f-1 -r1+s -a1"
-        // Запускаем через ProcessBuilder, а НЕ через JNI
         val command = arrayOf(binFile.absolutePath, "-i", BYEDPI_PROXY_ADDRESS, "-p", BYEDPI_PROXY_PORT.toString()) +
                 args.split("\\s+".toRegex()).toTypedArray()
 
@@ -36,7 +35,6 @@ class ByeDpiManager {
             .redirectErrorStream(true)
             .start()
 
-        // Читаем логи, чтобы видеть, что происходит внутри ByeDPI
         Thread {
             process.inputStream.bufferedReader().forEachLine { Log.e("ByeDPI_LOG", it) }
         }.start()
@@ -55,7 +53,7 @@ class ByeDpiManager {
             try {
                 Socket(BYEDPI_PROXY_ADDRESS, port).use { return@withContext true }
             } catch (e: Exception) {
-                delay(100) // Ждем чуть-чуть перед следующей попыткой
+                delay(100)
             }
         }
         false
@@ -86,7 +84,6 @@ class ByeDpiManager {
             connection.requestMethod = "HEAD"
 
             Log.e("DomainCheck", "Domain is reachable without proxy, continue")
-            // A 200-level code generally means the resource is available
             connection.responseCode in 200..299
         } catch (e: IOException) {
             Log.e("DomainCheck", e.toString())

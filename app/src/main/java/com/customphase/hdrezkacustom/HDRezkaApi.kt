@@ -24,6 +24,9 @@ import javax.net.ssl.*
 import java.net.InetAddress
 import java.net.Socket
 import javax.net.SocketFactory
+import androidx.appcompat.app.AlertDialog
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class HDRezkaApi(val context: Context) {
     private val SEARCH_URL = "/search/?do=search&subaction=search&q="
@@ -39,25 +42,21 @@ class HDRezkaApi(val context: Context) {
     ) : SocketFactory() {
 
         override fun createSocket(): Socket {
-            // Создаем сокет с привязкой к прокси
             val proxy = Proxy(Proxy.Type.SOCKS, InetSocketAddress(proxyHost, proxyPort))
             return Socket(proxy)
         }
 
         override fun createSocket(host: String, port: Int): Socket {
-            // 1. ВРУЧНУЮ резолвим через переданный DNS (теперь лог появится!)
             val addresses = dns.lookup(host)
             val resolvedIp = addresses.first().hostAddress
 
             Log.e("DNS_CHECK", "Manual resolve: $host -> $resolvedIp")
 
             val socket = createSocket()
-            // 2. Подключаемся к прокси, передавая уже IP, а не имя хоста
             socket.connect(InetSocketAddress(resolvedIp, port))
             return socket
         }
 
-        // Эти методы OkHttp обычно не использует для HTTP-запросов, но их нужно реализовать
         override fun createSocket(host: String, port: Int, localHost: InetAddress?, localPort: Int) = createSocket(host, port)
         override fun createSocket(address: InetAddress, port: Int) = createSocket().apply { connect(InetSocketAddress(address, port)) }
         override fun createSocket(address: InetAddress, port: Int, localAddress: InetAddress?, localPort: Int) = createSocket(address, port)
@@ -110,10 +109,10 @@ class HDRezkaApi(val context: Context) {
                 builder.dns(myDns)
             }
             builder.sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
-                    .hostnameVerifier { _, _ -> true } // любой hostname
+                    .hostnameVerifier { _, _ -> true }
                     .followRedirects(true)
                     .build()
-        } catch (e: Throwable) { // Используйте Throwable вместо Exception
+        } catch (e: Throwable) {
             Log.e("CRASH_DEBUG", "Ошибка инициализации клиента", e)
             throw e
         }
@@ -142,24 +141,35 @@ class HDRezkaApi(val context: Context) {
             .addHeader("Sec-Fetch-User", "?1")
     }
 
-    // Выполнение HTTP-запроса
     private suspend fun makeRequest(url: String): String? {
         val request = Request.Builder()
             .url(url)
             .addHDRezkaHeaders()
             .build()
+        return makeRequest(request, client)
+    }
 
+    private suspend fun makeRequest(request: Request, cli: OkHttpClient) : String? {
         return try {
-            client.newCall(request).execute().use { response ->
+            cli.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) {
-                    println("Request failed: error ${response.code}")
+                    Log.e("HDRezkaRequest", "Request failed: error ${response.code}")
                     null
                 } else {
                     response.body?.string()
                 }
             }
         } catch (e: IOException) {
-            e.printStackTrace()
+            withContext(Dispatchers.Main) {
+                val builder = AlertDialog.Builder(context)
+                builder.setTitle("Ошибка при обращении к ${request.url}")
+                builder.setMessage(e.toString())
+                builder.setNegativeButton("Okay :(") { dialog, which ->
+                    dialog.dismiss()
+                }
+                builder.show()
+                e.printStackTrace()
+            }
             null
         }
     }
@@ -167,6 +177,23 @@ class HDRezkaApi(val context: Context) {
     suspend fun warmup() {
         val url = context.getString(R.string.site_url)
         makeRequest(url)
+    }
+
+    suspend fun login(login : String, password : String) {
+        val formBody = FormBody.Builder()
+            .add("login_name", login)
+            .add("login_password", password)
+            .add("login_not_save", "0")
+            .build()
+
+        val request = Request.Builder()
+            .url("${context.getString(R.string.site_url)}$LOGIN_URL")
+            .post(formBody)
+            .addHDRezkaHeaders()
+            .addHeader("X-Requested-With", "XMLHttpRequest")
+            .build()
+
+        makeRequest(request, client)
     }
 
     suspend fun search(query: String): List<SearchResult> {
@@ -295,28 +322,21 @@ class HDRezkaApi(val context: Context) {
             .url("${context.getString(R.string.site_url)}$GET_STREAMS_URL")
             .post(formBody)
             .addHDRezkaHeaders()
-            .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
+            .addHeader("X-Requested-With", "XMLHttpRequest")
             .build()
 
-        guestClient.newCall(request).execute().use { response ->
-            val body = response.body
-            val bodyString = body?.string()
-            if (!response.isSuccessful || bodyString == null) {
-                println("Request failed: error ${response.code}")
-                null
-            } else {
-                val jsonObject = JSONObject(bodyString)
-                val urls = jsonObject.getString("url").toString().split(",")
-                val qualities = mutableMapOf<String, String>()
-                for (url in urls) {
-                    val parts = url.split(" or ")
-                    val quality = parts[0].substringAfter("[").substringBefore("]")
-                    val link = parts[0].substringAfter("]").replace("\\/", "/")
-                    qualities[quality] = link
-                }
-                return qualities
-            }
+        val response = makeRequest(request, guestClient)
+
+        val jsonObject = JSONObject(response)
+        val urls = jsonObject.getString("url").toString().split(",")
+        val qualities = mutableMapOf<String, String>()
+        for (url in urls) {
+            val parts = url.split(" or ")
+            val quality = parts[0].substringAfter("[").substringBefore("]")
+            val link = parts[0].substringAfter("]").replace("\\/", "/")
+            qualities[quality] = link
         }
+        return qualities
 
         return mapOf()
     }
@@ -332,47 +352,23 @@ class HDRezkaApi(val context: Context) {
             .url("${context.getString(R.string.site_url)}$GET_EPISODES_URL")
             .post(formBody)
             .addHDRezkaHeaders()
-            .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
+            .addHeader("X-Requested-With", "XMLHttpRequest")
             .build()
 
-        client.newCall(request).execute().use { response ->
-            val body = response.body
-            if (!response.isSuccessful || body == null) {
-                println("Request failed: error ${response.code}")
-                return MediaItem()
-            } else {
-                val jsonObject = JSONObject(body.string())
-                val seasonsDoc = Jsoup.parse(jsonObject.getString("seasons"))
-                val episodesDoc = Jsoup.parse(jsonObject.getString("episodes"))
-                return MediaItem(
-                    itemId,
-                    "",
-                    "",
-                    "",
-                    0,
-                    listOf(),
-                    parseMediaSelections(seasonsDoc, ".b-simple_season__item"),
-                    parseMediaSelections(episodesDoc, ".b-simple_episode__item")
-                )
-            }
-        }
-    }
-
-    suspend fun login(login : String, password : String) {
-        val formBody = FormBody.Builder()
-            .add("login_name", login)
-            .add("login_password", password)
-            .add("login_not_save", "0")
-            .build()
-
-        val request = Request.Builder()
-            .url("${context.getString(R.string.site_url)}$LOGIN_URL")
-            .post(formBody)
-            .addHDRezkaHeaders()
-            .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
-            .build()
-
-        client.newCall(request).execute()
+        val response = makeRequest(request, guestClient)
+        val jsonObject = JSONObject(response)
+        val seasonsDoc = Jsoup.parse(jsonObject.getString("seasons"))
+        val episodesDoc = Jsoup.parse(jsonObject.getString("episodes"))
+        return MediaItem(
+            itemId,
+            "",
+            "",
+            "",
+            0,
+            listOf(),
+            parseMediaSelections(seasonsDoc, ".b-simple_season__item"),
+            parseMediaSelections(episodesDoc, ".b-simple_episode__item")
+        )
     }
 
     suspend fun saveProgress(itemId : Int,
@@ -392,10 +388,10 @@ class HDRezkaApi(val context: Context) {
             .url("${context.getString(R.string.site_url)}/ajax/send_watching/")
             .post(formBody)
             .addHDRezkaHeaders()
-            .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
+            .addHeader("X-Requested-With", "XMLHttpRequest")
             .build()
 
-        client.newCall(request).execute()
+        makeRequest(request, client)
 
         formBody = FormBody.Builder()
             .add("post_id", itemId.toString())
@@ -410,9 +406,9 @@ class HDRezkaApi(val context: Context) {
             .url("${context.getString(R.string.site_url)}$SAVE_PROGRESS_URL")
             .post(formBody)
             .addHDRezkaHeaders()
-            .addHeader("X-Requested-With", "XMLHttpRequest")   // important for AJAX detection
+            .addHeader("X-Requested-With", "XMLHttpRequest")
             .build()
 
-        client.newCall(request).execute()
+        makeRequest(request, client)
     }
 }

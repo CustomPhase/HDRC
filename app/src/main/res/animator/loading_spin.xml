@@ -4,7 +4,7 @@
         <set>
             <objectAnimator
                 android:propertyName="rotation"
-                android:valueTo="540" android:duration="900"
+                android:valueTo="-180" android:duration="900"
                 android:repeatCount="infinite"/>
         </set>
     </item>

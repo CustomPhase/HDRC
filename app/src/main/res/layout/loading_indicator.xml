@@ -11,7 +11,7 @@
     <ImageView
         android:layout_width="26dp"
         android:layout_height="26dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginRight="12dp"
         android:rotation="180"
         android:stateListAnimator="@animator/loading_spin"
         app:tint="@color/main_text"
