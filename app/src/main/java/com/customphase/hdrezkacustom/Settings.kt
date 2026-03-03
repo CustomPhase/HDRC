@@ -1,5 +1,8 @@
 package com.customphase.hdrezkacustom
 
+import androidx.annotation.Keep
+
+@Keep
 class Settings {
     @Transient // non-serialized
     var onUpdate: (() -> Unit)? = null
