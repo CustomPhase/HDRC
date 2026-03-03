@@ -28,7 +28,7 @@ import androidx.appcompat.app.AlertDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class HDRezkaApi_Log(val context: Context) {
+class HDRezkaApi(val context: Context) {
     private val SEARCH_URL = "/search/?do=search&subaction=search&q="
     private val GET_STREAMS_URL = "/ajax/get_cdn_series/"
     private val GET_EPISODES_URL = "/ajax/get_cdn_series/"
