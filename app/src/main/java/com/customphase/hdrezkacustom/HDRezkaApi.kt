@@ -328,6 +328,11 @@ class HDRezkaApi(val context: Context) {
         val response = makeRequest(request, guestClient)
 
         val jsonObject = JSONObject(response)
+        if (!jsonObject.has("url")) {
+            Log.e("HDRezkaApi_Log", response.toString())
+            return mapOf(Pair("empty", ""))
+        }
+
         val urls = jsonObject.getString("url").toString().split(",")
         val qualities = mutableMapOf<String, String>()
         for (url in urls) {
