@@ -1,5 +1,5 @@
 # HDRezka Custom
-Неофициальное минимальное легковесное приложение под анроид для просмотра контента с сервиса HDRezka
+Неофициальное минимальное легковесное приложение под андроид для просмотра контента с сервиса HDRezka
 
 > [!IMPORTANT]
 > Данное приложение не является официальным, и не связанно с самим сайтом и разработчиками HDRezka.
@@ -10,9 +10,14 @@
 * Просмотр с выбором озвучки\сезона\эпизода
 * Сохранение истории и прогресса просмотра (локально и на серверах hdrezka, если введены данные для входа в учетную запись)
 * Обход блокировки домена hdrezka (с использованием библиотеки byedpi)
-  
-<img width="1920" height="1080" alt="Screenshot_20260303_172534" src="https://github.com/user-attachments/assets/0264fcf6-e74d-4f83-b314-844b649ea40c" />
 
-<img width="1920" height="1080" alt="Screenshot_20260303_172421" src="https://github.com/user-attachments/assets/decdeb5b-57d4-4d5c-97a5-8d05cd34f1e1" />
+#### Благодарности
+[@hufrea](https://github.com/hufrea) https://github.com/hufrea/byedpi
 
-<img width="1920" height="1080" alt="Screenshot_20260303_200236" src="https://github.com/user-attachments/assets/8f8a5993-3612-4a41-9c58-426a2251286e" />
+<img width="24%" alt="Screenshot_20260303_172534" src="https://github.com/user-attachments/assets/0264fcf6-e74d-4f83-b314-844b649ea40c" />
+
+<img width="24%" alt="Screenshot_20260303_172421" src="https://github.com/user-attachments/assets/decdeb5b-57d4-4d5c-97a5-8d05cd34f1e1" />
+
+<img width="24%" alt="Screenshot_20260303_200236" src="https://github.com/user-attachments/assets/8f8a5993-3612-4a41-9c58-426a2251286e" />
+
+<img width="24%" alt="hdrc_4" src="https://github.com/user-attachments/assets/d20602d9-9fe1-47ad-8c09-8c6fa448b902" />
