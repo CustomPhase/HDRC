@@ -15,4 +15,4 @@
 
 <img width="1920" height="1080" alt="Screenshot_20260303_172421" src="https://github.com/user-attachments/assets/decdeb5b-57d4-4d5c-97a5-8d05cd34f1e1" />
 
-<img width="1920" height="1080" alt="Screenshot_20260303_172904" src="https://github.com/user-attachments/assets/13e0af27-4369-4083-b01b-821703919eb7" />
+<img width="1920" height="1080" alt="Screenshot_20260303_200236" src="https://github.com/user-attachments/assets/8f8a5993-3612-4a41-9c58-426a2251286e" />
