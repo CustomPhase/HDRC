@@ -10,3 +10,9 @@
 * Просмотр с выбором озвучки\сезона\эпизода
 * Сохранение истории и прогресса просмотра (локально и на серверах hdrezka, если введены данные для входа в учетную запись)
 * Обход блокировки домена hdrezka (с использованием библиотеки byedpi)
+  
+<img width="1920" height="1080" alt="Screenshot_20260303_172534" src="https://github.com/user-attachments/assets/0264fcf6-e74d-4f83-b314-844b649ea40c" />
+
+<img width="1920" height="1080" alt="Screenshot_20260303_172421" src="https://github.com/user-attachments/assets/decdeb5b-57d4-4d5c-97a5-8d05cd34f1e1" />
+
+<img width="1920" height="1080" alt="Screenshot_20260303_172904" src="https://github.com/user-attachments/assets/13e0af27-4369-4083-b01b-821703919eb7" />
