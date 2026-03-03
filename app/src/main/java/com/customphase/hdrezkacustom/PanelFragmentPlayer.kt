@@ -1,10 +1,11 @@
 package com.customphase.hdrezkacustom
 
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.PixelCopy
@@ -12,8 +13,10 @@ import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.C
@@ -47,6 +50,9 @@ class PanelFragmentPlayer : PanelFragment() {
 
     private lateinit var playerView : PlayerView
 
+    private lateinit var prevButton : ImageButton
+    private lateinit var nextButton : ImageButton
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.panel_player, container, false)
         playerView = view.findViewById(R.id.playerView)
@@ -60,6 +66,8 @@ class PanelFragmentPlayer : PanelFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        prevButton = view.findViewById(R.id.exoPrevCustom)
+        nextButton = view.findViewById(R.id.exoNextCustom)
         lifecycleScope.launch(Dispatchers.Main) {
             player = ExoPlayer.Builder(requireContext()).build()
             playerView.player = player
@@ -180,6 +188,18 @@ class PanelFragmentPlayer : PanelFragment() {
         }, Handler(Looper.getMainLooper()))
     }
 
+    fun setButtonState(btn : ImageButton, enabled : Boolean) {
+        btn.setOnClickListener {  }
+        lifecycleScope.launch {
+            btn.isEnabled = enabled
+            btn.isFocusable = enabled
+            val color = if (enabled)
+                ContextCompat.getColor((activity as MainActivity), R.color.main_text)
+                else Color.DKGRAY
+            btn.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+        }
+    }
+
     fun play(itemTitle : String,
              itemId : Int,
              translatorId : Int,
@@ -214,6 +234,64 @@ class PanelFragmentPlayer : PanelFragment() {
                 player.seekTo(startTime)
                 player.prepare()
                 player.playWhenReady = true
+            }
+
+            setButtonState(prevButton, false)
+            setButtonState(nextButton, false)
+
+            if (seasonId != 0) {
+                val episodes = (activity as MainActivity).hdrezkaApi.getMediaEpisodes(itemId, translatorId)
+
+                var seasonsAndEpisodes = mutableMapOf<Int, MutableList<Int>>()
+                for(ep in episodes.episodes) {
+                    if (!seasonsAndEpisodes.containsKey(ep.seasonId)) seasonsAndEpisodes[ep.seasonId] = mutableListOf()
+                    seasonsAndEpisodes[ep.seasonId]?.add(ep.episodeId)
+                }
+                seasonsAndEpisodes.forEach { (_, episodes) ->
+                    episodes.sort()
+                }
+                seasonsAndEpisodes = seasonsAndEpisodes.toSortedMap()
+
+                val currentSeason = seasonsAndEpisodes[seasonId]!!
+
+                var prevSeason = seasonId
+                var prevEpisode = episodeId
+                if (currentSeason.contains(episodeId - 1)) {
+                    prevEpisode = episodeId - 1
+                } else {
+                    if (episodeId == 1 && seasonsAndEpisodes.containsKey(seasonId - 1)) {
+                        prevSeason = seasonId - 1
+                        prevEpisode = seasonsAndEpisodes[seasonId - 1]?.last()!!
+                    }
+                }
+
+                var nextSeason = seasonId
+                var nextEpisode = episodeId
+                if (currentSeason.contains(episodeId + 1)) {
+                    nextEpisode = episodeId + 1
+                } else {
+                    if (seasonsAndEpisodes.containsKey(seasonId + 1) &&
+                        seasonsAndEpisodes[seasonId + 1]?.first()!! == 1) {
+                        nextSeason = seasonId + 1
+                        nextEpisode = 1
+                    }
+                }
+
+                if (prevSeason != seasonId || prevEpisode != episodeId) {
+                    setButtonState(prevButton, true)
+                    prevButton.setOnClickListener {
+                        play(itemTitle, itemId, translatorId, prevSeason,
+                            prevEpisode, isDirector, 0)
+                    }
+                }
+
+                if (nextSeason != seasonId || nextEpisode != episodeId) {
+                    setButtonState(nextButton, true)
+                    nextButton.setOnClickListener {
+                        play(itemTitle, itemId, translatorId, nextSeason,
+                            nextEpisode, isDirector, 0)
+                    }
+                }
             }
         }
     }
