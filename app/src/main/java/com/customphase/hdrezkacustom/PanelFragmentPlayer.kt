@@ -1,8 +1,14 @@
 package com.customphase.hdrezkacustom
 
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
+import android.view.PixelCopy
+import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -21,7 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
+import androidx.core.graphics.createBitmap
 
 class PanelFragmentPlayer : PanelFragment() {
     override val iconResource: Int
@@ -145,15 +151,33 @@ class PanelFragmentPlayer : PanelFragment() {
 
     private fun saveToWatchHistory() {
         if (itemId == 0) return
-        (activity as MainActivity).saveDataManager.addOrUpdateWatchHistoryItem(
-            itemTitle,
-            itemId,
-            translatorId,
-            seasonId,
-            episodeId,
-            player.currentPosition,
-            player.duration
-        )
+        captureScreenshot {
+            val finalScreenshot = it ?: createBitmap(1, 1)
+
+            (activity as MainActivity).saveDataManager.addOrUpdateWatchHistoryItem(
+                itemTitle,
+                itemId,
+                translatorId,
+                seasonId,
+                episodeId,
+                player.currentPosition,
+                player.duration,
+                finalScreenshot
+            )
+        }
+    }
+
+    fun captureScreenshot(callback: (Bitmap?) -> Unit) {
+        val view = playerView.videoSurfaceView as SurfaceView
+        val bitmap = createBitmap(160, 90)
+
+        PixelCopy.request(view, bitmap, { result ->
+            if (result == PixelCopy.SUCCESS) {
+                callback(bitmap)
+            } else {
+                callback(null)
+            }
+        }, Handler(Looper.getMainLooper()))
     }
 
     fun play(itemTitle : String,

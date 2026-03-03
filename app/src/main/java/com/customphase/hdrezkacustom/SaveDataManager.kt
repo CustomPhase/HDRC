@@ -1,5 +1,6 @@
 package com.customphase.hdrezkacustom
 import android.content.Context
+import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -54,6 +55,30 @@ class SaveDataManager(val context: Context, val hdrezkaApi : HDRezkaApi, val sco
         }
     }
 
+    fun addOrUpdateWatchHistoryItem(
+        itemTitle : String,
+        itemId : Int,
+        translatorId : Int,
+        seasonId : Int,
+        episodeId : Int,
+        currentTime : Long,
+        duration : Long,
+        screenshot : Bitmap)
+    {
+        if (!watchHistory.containsKey(itemId)) watchHistory[itemId] = WatchHistoryItem()
+        watchHistory[itemId]?.title = itemTitle
+        watchHistory[itemId]?.selection?.translatorId = translatorId
+        watchHistory[itemId]?.selection?.seasonId = seasonId
+        watchHistory[itemId]?.selection?.episodeId = episodeId
+        watchHistory[itemId]?.currentTime = currentTime
+        watchHistory[itemId]?.setScreenshot(screenshot)
+        val progress = currentTime.toDouble() / duration
+        scope.launch (Dispatchers.IO) {
+            hdrezkaApi.saveProgress(itemId, translatorId, seasonId, episodeId, progress, duration.toDouble() / 1000)
+        }
+        saveWatchHistory()
+    }
+
     private fun saveWatchHistory() {
         saveWatchHistoryJob?.cancel()
         saveWatchHistoryJob = scope.launch {
@@ -62,28 +87,6 @@ class SaveDataManager(val context: Context, val hdrezkaApi : HDRezkaApi, val sco
                 data[WATCH_HISTORY_KEY] = gson.toJson(watchHistory).toString()
             }
         }
-    }
-
-    fun addOrUpdateWatchHistoryItem(
-        itemTitle : String,
-        itemId : Int,
-        translatorId : Int,
-        seasonId : Int,
-        episodeId : Int,
-        currentTime : Long,
-        duration : Long)
-    {
-        if (!watchHistory.containsKey(itemId)) watchHistory[itemId] = WatchHistoryItem()
-        watchHistory[itemId]?.title = itemTitle
-        watchHistory[itemId]?.selection?.translatorId = translatorId
-        watchHistory[itemId]?.selection?.seasonId = seasonId
-        watchHistory[itemId]?.selection?.episodeId = episodeId
-        watchHistory[itemId]?.currentTime = currentTime
-        val progress = currentTime.toDouble() / duration
-        scope.launch (Dispatchers.IO) {
-            hdrezkaApi.saveProgress(itemId, translatorId, seasonId, episodeId, progress, duration.toDouble() / 1000)
-        }
-        saveWatchHistory()
     }
 
     fun deleteWatchHistoryItem(id : Int) {

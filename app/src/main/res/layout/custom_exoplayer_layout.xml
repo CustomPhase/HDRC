@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -128,21 +129,20 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:clipToPadding="false"
-        android:clipChildren="false">
+        android:clipChildren="false"
+        android:clipToPadding="false">
 
         <LinearLayout
             android:id="@+id/exoSpeedControls"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#80040E26"
-            android:orientation="horizontal"
-            android:padding="9dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:clipChildren="false"
             android:clipToPadding="false"
-            android:clipChildren="false"></LinearLayout>
+            android:orientation="horizontal"
+            android:padding="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:layout_editor_absoluteX="10dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

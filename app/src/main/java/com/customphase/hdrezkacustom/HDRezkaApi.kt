@@ -28,7 +28,7 @@ import androidx.appcompat.app.AlertDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class HDRezkaApi(val context: Context) {
+class HDRezkaApi_Log(val context: Context) {
     private val SEARCH_URL = "/search/?do=search&subaction=search&q="
     private val GET_STREAMS_URL = "/ajax/get_cdn_series/"
     private val GET_EPISODES_URL = "/ajax/get_cdn_series/"
@@ -50,7 +50,7 @@ class HDRezkaApi(val context: Context) {
             val addresses = dns.lookup(host)
             val resolvedIp = addresses.first().hostAddress
 
-            Log.e("DNS_CHECK", "Manual resolve: $host -> $resolvedIp")
+            Log.e("HDRezkaApi_Log", "Manual resolve: $host -> $resolvedIp")
 
             val socket = createSocket()
             socket.connect(InetSocketAddress(resolvedIp, port))
@@ -98,7 +98,7 @@ class HDRezkaApi(val context: Context) {
             val myDns = object : Dns {
                 override fun lookup(hostname: String): List<InetAddress> {
                     val addr = Dns.SYSTEM.lookup(hostname)
-                    Log.e("DNS_CHECK", "OkHttp DNS: $hostname -> ${addr.first()}")
+                    Log.e("HDRezkaApi_Log", "OkHttp DNS: $hostname -> ${addr.first()}")
                     return addr
                 }
             }
@@ -113,7 +113,7 @@ class HDRezkaApi(val context: Context) {
                     .followRedirects(true)
                     .build()
         } catch (e: Throwable) {
-            Log.e("CRASH_DEBUG", "Ошибка инициализации клиента", e)
+            Log.e("HDRezkaApi_Log", "Ошибка инициализации клиента", e)
             throw e
         }
     }
@@ -153,7 +153,7 @@ class HDRezkaApi(val context: Context) {
         return try {
             cli.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) {
-                    Log.e("HDRezkaRequest", "Request failed: error ${response.code}")
+                    Log.e("HDRezkaApi_Log", "Request failed: error ${response.code}")
                     null
                 } else {
                     response.body?.string()

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
@@ -44,6 +45,9 @@ class PanelFragmentHistory : PanelFragment() {
                 title.text = item.value.title
                 val info = itemView.findViewById<TextView>(R.id.watchHistoryItemInfo)
                 info.text = getMediaInfoAsString(item.value.selection.seasonId, item.value.selection.episodeId)
+                val image = itemView.findViewById<ImageView>(R.id.watchHistoryItemImage)
+                image.setImageBitmap(item.value.getScreenshotBitmap())
+
                 val resumeButton = itemView.findViewById<Button>(R.id.watchHistoryItemResume)
                 resumeButton.setOnClickListener {
                     (activity as MainActivity).showPlayerPanel(

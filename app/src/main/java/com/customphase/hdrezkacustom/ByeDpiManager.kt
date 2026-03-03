@@ -36,14 +36,14 @@ class ByeDpiManager {
             .start()
 
         Thread {
-            process.inputStream.bufferedReader().forEachLine { Log.e("ByeDPI_LOG", it) }
+            process.inputStream.bufferedReader().forEachLine { Log.e("ByeDpi_Log", it) }
         }.start()
 
         if (!waitForProxy(BYEDPI_PROXY_PORT, 5000)) {
             throw Exception("Порт $BYEDPI_PROXY_PORT не открылся за 5 секунд")
         }
 
-        Log.e("ByeDPI_LOG", "Proxy started successfully")
+        Log.e("ByeDpi_Log", "Proxy started successfully")
         byeDpiStarted = true
     }
 
@@ -83,13 +83,13 @@ class ByeDpiManager {
             connection.connectTimeout = 3000
             connection.requestMethod = "HEAD"
 
-            Log.e("DomainCheck", "Domain is reachable without proxy, continue")
+            Log.e("ByeDpi_Log", "Domain is reachable without proxy, byedpi disabled")
             connection.responseCode in 200..299
         } catch (e: IOException) {
-            Log.e("DomainCheck", e.toString())
+            Log.e("ByeDpi_Log", e.toString())
             false
         } catch (e: Exception) {
-            Log.e("DomainCheck", e.toString())
+            Log.e("ByeDpi_Log", e.toString())
             false
         }
     }
