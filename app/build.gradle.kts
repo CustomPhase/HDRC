@@ -56,10 +56,12 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 
-    implementation("com.google.android.exoplayer:exoplayer-core:2.18.7")
-    implementation("com.google.android.exoplayer:exoplayer-hls:2.18.7")
-    implementation("com.google.android.exoplayer:exoplayer-ui:2.18.7")
-    implementation("com.google.android.exoplayer:extension-okhttp:2.18.7")
+    val media3_version = "1.2.1"
+
+    implementation("androidx.media3:media3-exoplayer:${media3_version}")
+    implementation("androidx.media3:media3-exoplayer-hls:${media3_version}")
+    implementation("androidx.media3:media3-ui:${media3_version}")
+    implementation("androidx.media3:media3-datasource-okhttp:${media3_version}")
 
     implementation("com.google.android.flexbox:flexbox:3.0.0")
 

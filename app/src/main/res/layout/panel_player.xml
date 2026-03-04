@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black">
-    <com.google.android.exoplayer2.ui.PlayerView
+    <androidx.media3.ui.PlayerView
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/playerView"
         android:layout_width="match_parent"
@@ -13,5 +13,5 @@
         android:theme="@style/ExoPlayerBufferingStyle"
         app:controller_layout_id="@layout/custom_exoplayer_layout"
         app:show_buffering="always">
-    </com.google.android.exoplayer2.ui.PlayerView>
+    </androidx.media3.ui.PlayerView>
 </FrameLayout>

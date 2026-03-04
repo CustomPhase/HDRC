@@ -16,22 +16,27 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.OptIn
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.lifecycle.lifecycleScope
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
-import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
-import com.google.android.exoplayer2.ui.PlayerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.core.graphics.createBitmap
+import androidx.media3.common.C
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.ui.PlayerView
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.okhttp.OkHttpDataSource
+import androidx.media3.common.MediaItem
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 
+@OptIn(UnstableApi::class)
 class PanelFragmentPlayer : PanelFragment() {
     override val iconResource: Int
         get() = R.drawable.icon_player
@@ -63,6 +68,7 @@ class PanelFragmentPlayer : PanelFragment() {
         val density = resources.displayMetrics.density
         return (dp * density).toInt()
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -112,7 +118,6 @@ class PanelFragmentPlayer : PanelFragment() {
         lifecycleScope.launch(Dispatchers.Main) {
             (activity as MainActivity).findViewById<View>(R.id.navigationContainer).visibility = View.GONE
             playerView.requestFocus()
-            playerView.hideController()
         }
     }
 
@@ -124,7 +129,7 @@ class PanelFragmentPlayer : PanelFragment() {
     }
 
     fun handleInput(keyCode : Int) : Boolean {
-        if (playerView.isControllerVisible) return false
+        if (playerView.isControllerFullyVisible) return false
         return when (keyCode) {
             KeyEvent.KEYCODE_DPAD_LEFT -> {
                 seekRelative(-10000)
@@ -141,6 +146,7 @@ class PanelFragmentPlayer : PanelFragment() {
         }
     }
 
+    private var seekCoroutine : Job? = null
     fun seekRelative(offsetMs: Long) {
         val newPosition = player.currentPosition + offsetMs
         val duration = player.duration
@@ -150,9 +156,10 @@ class PanelFragmentPlayer : PanelFragment() {
             newPosition.coerceAtLeast(0)
         }
         playerView.useController = false
+        seekCoroutine?.cancel()
         player.seekTo(targetPosition)
-        lifecycleScope.launch {
-            delay(16)
+        seekCoroutine = lifecycleScope.launch {
+            delay(50)
             playerView.useController = true
         }
     }
