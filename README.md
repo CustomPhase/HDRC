@@ -1,4 +1,7 @@
+ <img width="120" height="120" alt="hdrc_logo" src="https://github.com/user-attachments/assets/f3669c4a-f374-4ef9-96fe-39ac27b920b7" />
+ 
 # HDRezka Custom
+
 Неофициальное минимальное легковесное приложение под андроид для просмотра контента с сервиса HDRezka
 
 > [!IMPORTANT]
