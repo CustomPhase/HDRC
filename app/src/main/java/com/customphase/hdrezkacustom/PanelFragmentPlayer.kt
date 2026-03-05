@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.core.graphics.createBitmap
 import androidx.media3.common.C
+import androidx.media3.common.Effect
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.ui.PlayerView
@@ -115,9 +116,12 @@ class PanelFragmentPlayer : PanelFragment() {
     }
 
     override fun onEnable() {
-        val brightness = BrightnessEffect(1 + settings.brightness)
+        var effects = listOf<Effect>()
+        if (settings.brightness > 0.1f) {
+            effects = listOf(BrightnessEffect(1 + settings.brightness))
+        }
         lifecycleScope.launch(Dispatchers.Main) {
-            player.setVideoEffects(listOf(brightness))
+            player.setVideoEffects(effects)
             (activity as MainActivity).findViewById<View>(R.id.navigationContainer).visibility = View.GONE
             playerView.requestFocus()
         }
