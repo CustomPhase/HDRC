@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@id/exo_controls_background">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -115,31 +115,25 @@
 
             <ImageButton
                 android:id="@+id/exoPrevCustom"
-                style="@style/ExoMediaButton.Previous"
+                style="@style/ExoStyledControls.Button.Center.Previous"
                 android:background="@drawable/player_focus_background"
                 app:tint="@color/main_text"
                 android:scaleX="1.3"
                 android:scaleY="1.3"/>
 
-            <FrameLayout
-                android:id="@+id/exoPlayPause"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ImageButton
+                android:id="@id/exo_play_pause"
+                style="@style/ExoStyledControls.Button.Center.PlayPause"
+                android:background="@drawable/player_focus_background"
+                app:tint="@color/main_text"
                 android:scaleX="1.5"
                 android:scaleY="1.5"
                 android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp">
-
-                <ImageButton
-                    android:id="@id/exo_play_pause"
-                    style="@style/ExoMediaButton.Pause"
-                    android:background="@drawable/player_focus_background"
-                    app:tint="@color/main_text" />
-            </FrameLayout>
+                android:layout_marginRight="50dp"/>
 
             <ImageButton
                 android:id="@+id/exoNextCustom"
-                style="@style/ExoMediaButton.Next"
+                style="@style/ExoStyledControls.Button.Center.Next"
                 android:background="@drawable/player_focus_background"
                 app:tint="@color/main_text"
                 android:scaleX="1.3"
@@ -155,8 +149,7 @@
             android:clipToPadding="false"
             android:orientation="horizontal"
             android:padding="12dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:layout_editor_absoluteX="10dp"/>
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
