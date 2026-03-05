@@ -13,5 +13,6 @@
     <string name="data_deleted">Данные удалены</string>
     <string name="data_saved">Данные сохранены</string>
     <string name="load_images">Загружать картинки</string>
+    <string name="brightness">Яркость видео</string>
     <string name="exit_confirm">Нажмите еще раз чтобы выйти</string>
 </resources>

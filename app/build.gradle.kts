@@ -55,6 +55,7 @@ dependencies {
     implementation("org.jsoup:jsoup:1.15.4")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation(libs.androidx.media3.effect)
 
     val media3_version = "1.2.1"
 

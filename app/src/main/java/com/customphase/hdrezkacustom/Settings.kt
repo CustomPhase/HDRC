@@ -10,6 +10,9 @@ class Settings {
     var loadImages: Boolean = true
         set(value) { field = value; onUpdate?.invoke() }
 
+    var brightness: Float = 0f
+        set(value) { field = value; onUpdate?.invoke() }
+
     var loginName : String = ""
         set(value) { field = value; onUpdate?.invoke() }
 

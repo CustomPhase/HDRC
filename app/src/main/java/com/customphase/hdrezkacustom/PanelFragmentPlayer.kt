@@ -115,7 +115,9 @@ class PanelFragmentPlayer : PanelFragment() {
     }
 
     override fun onEnable() {
+        val brightness = BrightnessEffect(1 + settings.brightness)
         lifecycleScope.launch(Dispatchers.Main) {
+            player.setVideoEffects(listOf(brightness))
             (activity as MainActivity).findViewById<View>(R.id.navigationContainer).visibility = View.GONE
             playerView.requestFocus()
         }
@@ -232,6 +234,7 @@ class PanelFragmentPlayer : PanelFragment() {
                 isDirector
             )
             withContext(Dispatchers.Main) {
+                player.stop()
                 val unsafeClient = (activity as MainActivity).hdrezkaApi.client
                 val dataSourceFactory = OkHttpDataSource.Factory(unsafeClient)
                     .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36")

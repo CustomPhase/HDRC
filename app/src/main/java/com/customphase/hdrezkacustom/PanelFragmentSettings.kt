@@ -6,11 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.ToggleButton
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.slider.Slider
 import kotlinx.coroutines.launch
+import kotlin.math.ceil
 
 class PanelFragmentSettings : PanelFragment() {
     override val iconResource: Int
@@ -22,6 +25,8 @@ class PanelFragmentSettings : PanelFragment() {
         val view = inflater.inflate(R.layout.panel_settings, container, false)
 
         val loadImages = view.findViewById<ToggleButton>(R.id.loadImages)
+        val brightness = view.findViewById<Slider>(R.id.brightness)
+        val brightnessValue = view.findViewById<TextView>(R.id.brightnessValue)
         val loginNameField = view.findViewById<EditText>(R.id.loginNameField)
         val loginPassField = view.findViewById<EditText>(R.id.loginPassField)
         val deleteDataButton = view.findViewById<Button>(R.id.deleteDataButton)
@@ -30,6 +35,13 @@ class PanelFragmentSettings : PanelFragment() {
         loadImages.isChecked = settings.loadImages
         loadImages.setOnClickListener {
             settings.loadImages = loadImages.isChecked
+        }
+
+        brightness.value = settings.brightness
+        setBrightnessValueText(brightnessValue, brightness.value)
+        brightness.addOnChangeListener { slider, f, bool ->
+            settings.brightness = slider.value
+            setBrightnessValueText(brightnessValue, slider.value)
         }
 
         lifecycleScope.launch {
@@ -57,6 +69,10 @@ class PanelFragmentSettings : PanelFragment() {
         }
 
         return view
+    }
+
+    private fun setBrightnessValueText(text : TextView, value : Float) {
+        text.text = ceil(100f + value).toInt().toString() + "%"
     }
 
     private fun showDeleteConfirmation(onConfirm : () -> Unit) {

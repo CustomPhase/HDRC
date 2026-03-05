@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginLeft="10dp"
     android:orientation="vertical"
     android:padding="10dp">
@@ -44,6 +45,55 @@
                 android:textOff="Нет"
                 android:textOn="Да"
                 android:textSize="18sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginRight="10dp"
+                android:labelFor="@+id/brightness"
+                android:text="@string/brightness"
+                android:textColor="@color/main_hint_text"
+                android:textSize="18sp"
+                android:gravity="center_vertical"/>
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/brightness"
+                style="@style/Widget.MaterialComponents.Slider"
+                android:layout_width="400dp"
+                android:layout_height="16dp"
+                android:focusable="true"
+                android:minHeight="10dp"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
+                android:stepSize="5"
+                android:valueFrom="0"
+                android:valueTo="100"
+                android:value="0"
+                app:haloRadius="6dp"
+                app:labelBehavior="gone"
+                app:thumbColor="@color/slider_thumb_color"
+                app:thumbHeight="12dp"
+                app:thumbRadius="8dp"
+                app:thumbWidth="12dp"
+                app:trackColorActive="@color/main_text"
+                app:trackColorInactive="@color/main_foreground"
+                app:trackHeight="5dp" />
+
+            <TextView
+                android:id="@+id/brightnessValue"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:text="(100%)"
+                android:textColor="@color/main_hint_text"
+                android:textSize="18sp"
+                android:gravity="center_vertical"/>
         </LinearLayout>
 
         <LinearLayout
