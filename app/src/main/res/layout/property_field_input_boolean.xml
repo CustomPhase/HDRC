@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ToggleButton xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="32dp"
+    android:background="@drawable/button_radio"
+    android:paddingTop="2dp"
+    android:paddingBottom="2dp"
+    android:textAllCaps="false"
+    android:textColor="@color/main_text"
+    android:textOff="Нет"
+    android:textOn="Да"
+    android:textSize="18sp" >
+
+</ToggleButton>

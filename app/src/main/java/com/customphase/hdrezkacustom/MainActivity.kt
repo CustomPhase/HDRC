@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -34,7 +33,7 @@ fun getMediaInfoAsString(seasonId : Int, episodeId : Int) : String {
 }
 
 fun loadImageFromUrlIntoView(target : ImageView, url : String) {
-    if (!settings.loadImages) return
+    if (!settings.loadImagesProp.getValue()) return
     Glide.with(target.context)
         .load(url)
         .error(android.R.drawable.ic_menu_help)
@@ -83,11 +82,13 @@ class MainActivity : AppCompatActivity() {
         })
 
         lifecycleScope.launch {
-            byeDpiManager.start(this@MainActivity)
             saveDataManager.loadSettings()
+            byeDpiManager.start(this@MainActivity)
             withContext(Dispatchers.IO) {
                 hdrezkaApi.warmup()
-                hdrezkaApi.login(settings.loginName, settings.loginPass)
+                hdrezkaApi.login(
+                    settings.loginNameProp.getValue(),
+                    settings.loginPassProp.getValue())
             }
             saveDataManager.loadWatchHistory()
             initializeFocusDebug()
@@ -165,7 +166,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun switchToPanel(panelClass: Class<out PanelFragment>, addToHistory: Boolean) {
         if (addToHistory && currentPanel != null) {
-            if (panelHistory.size > 16) panelHistory.removeLast()
+            if (panelHistory.size > 5) panelHistory.removeLast()
             panelHistory.push(currentPanel!!::class.java)
         }
 

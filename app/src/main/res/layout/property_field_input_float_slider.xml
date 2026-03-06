@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/propertyFieldInputSlider"
+        style="@style/Widget.MaterialComponents.Slider"
+        android:layout_width="400dp"
+        android:layout_height="16dp"
+        android:layout_marginLeft="-5dp"
+        android:layout_marginTop="-6dp"
+        android:layout_marginBottom="-6dp"
+        android:minHeight="10dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
+        android:stepSize="5"
+        android:value="0"
+        android:valueFrom="0"
+        android:valueTo="100"
+        app:haloRadius="16dp"
+        app:labelBehavior="gone"
+        app:thumbColor="@color/slider_thumb_color"
+        app:thumbHeight="14dp"
+        app:thumbRadius="8dp"
+        app:thumbWidth="14dp"
+        app:trackColorActive="@color/main_text"
+        app:trackColorInactive="@color/main_foreground"
+        app:trackHeight="6dp"/>
+    <TextView
+        android:id="@+id/propertyFieldInputValueText"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:textSize="18sp"
+        android:textColor="@color/main_hint_text"
+        android:layout_marginLeft="10dp"
+        android:gravity="center_vertical"/>
+</LinearLayout>

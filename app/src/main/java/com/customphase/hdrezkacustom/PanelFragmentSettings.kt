@@ -5,15 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.ToggleButton
-import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.slider.Slider
-import kotlinx.coroutines.launch
-import kotlin.math.ceil
 
 class PanelFragmentSettings : PanelFragment() {
     override val iconResource: Int
@@ -24,43 +16,15 @@ class PanelFragmentSettings : PanelFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.panel_settings, container, false)
 
-        val loadImages = view.findViewById<ToggleButton>(R.id.loadImages)
-        val brightness = view.findViewById<Slider>(R.id.brightness)
-        val brightnessValue = view.findViewById<TextView>(R.id.brightnessValue)
-        val loginNameField = view.findViewById<EditText>(R.id.loginNameField)
-        val loginPassField = view.findViewById<EditText>(R.id.loginPassField)
         val deleteDataButton = view.findViewById<Button>(R.id.deleteDataButton)
         val saveDataManager = (activity as MainActivity).saveDataManager
+        val settingsContainer = view.findViewById<ViewGroup>(R.id.settingsContainer)
 
-        loadImages.isChecked = settings.loadImages
-        loadImages.setOnClickListener {
-            settings.loadImages = loadImages.isChecked
-        }
-
-        brightness.value = settings.brightness
-        setBrightnessValueText(brightnessValue, brightness.value)
-        brightness.addOnChangeListener { slider, f, bool ->
-            settings.brightness = slider.value
-            setBrightnessValueText(brightnessValue, slider.value)
-        }
-
-        lifecycleScope.launch {
-            val name = settings.loginName
-            loginNameField.setText(name)
-            loginNameField.setSelection(name.length)
-
-            val pass = settings.loginPass
-            loginPassField.setText(pass)
-            loginPassField.setSelection(pass.length)
-        }
-
-        loginNameField.addTextChangedListener {
-            settings.loginName = it.toString()
-        }
-
-        loginPassField.addTextChangedListener {
-            settings.loginPass = it.toString()
-        }
+        settings.loadImagesProp.createView(layoutInflater, settingsContainer, getString(R.string.load_images))
+        settings.brightnessProp.createView(layoutInflater, settingsContainer, getString(R.string.brightness))
+        settings.byeDpiStrategyProp.createView(layoutInflater, settingsContainer, getString(R.string.byedpi_strategy))
+        settings.loginNameProp.createView(layoutInflater, settingsContainer, "E-mail для входа")
+        settings.loginPassProp.createView(layoutInflater, settingsContainer, "Пароль для входа")
 
         deleteDataButton.setOnClickListener {
             showDeleteConfirmation() {
@@ -69,10 +33,6 @@ class PanelFragmentSettings : PanelFragment() {
         }
 
         return view
-    }
-
-    private fun setBrightnessValueText(text : TextView, value : Float) {
-        text.text = ceil(100f + value).toInt().toString() + "%"
     }
 
     private fun showDeleteConfirmation(onConfirm : () -> Unit) {

@@ -117,8 +117,8 @@ class PanelFragmentPlayer : PanelFragment() {
 
     override fun onEnable() {
         var effects = listOf<Effect>()
-        if (settings.brightness > 0.1f) {
-            effects = listOf(BrightnessEffect(1 + settings.brightness))
+        if (settings.brightnessProp.getValue() > 0.1f) {
+            effects = listOf(BrightnessEffect(1 + settings.brightnessProp.getValue()))
         }
         lifecycleScope.launch(Dispatchers.Main) {
             player.setVideoEffects(effects)

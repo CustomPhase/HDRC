@@ -27,7 +27,8 @@ class ByeDpiManager {
         val nativeDir = context.applicationInfo.nativeLibraryDir
         val binFile = File(nativeDir, "libbyedpi.so")
 
-        val args = "-H:rezka.ag -s1 -q1 -r1+s -a1 -Ar -o1 -a1 -At -f-1 -r1+s -a1"
+        val strategy = settings.byeDpiStrategyProp.getValue()
+        val args = "-H:rezka.ag $strategy"
         val command = arrayOf(binFile.absolutePath, "-i", BYEDPI_PROXY_ADDRESS, "-p", BYEDPI_PROXY_PORT.toString()) +
                 args.split("\\s+".toRegex()).toTypedArray()
 

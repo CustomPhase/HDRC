@@ -8,7 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#80040E26"
+        android:background="#D90A1221"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
-            android:background="#900E1A31">
+            android:background="#E6070B16">
 
             <TextView
                 android:id="@+id/exoTitle"
@@ -91,7 +91,8 @@
                 android:layout_marginLeft="14dp"
                 app:buffered_color="@color/main_foreground"
                 app:played_color="@color/main_text"
-                app:unplayed_color="@color/main_background" />
+                app:unplayed_color="@color/main_background"
+                app:scrubber_drawable="@drawable/slider_thumb"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -144,7 +145,7 @@
             android:id="@+id/exoSpeedControls"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#80040E26"
+            android:background="#D90A1221"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:orientation="horizontal"

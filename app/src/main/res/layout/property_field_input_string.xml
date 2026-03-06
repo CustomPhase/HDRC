@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.customphase.hdrezkacustom.EditTextWithCorrectNavigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="40dp"
+    android:layout_weight="1"
+    android:autofillHints=""
+    android:hint="введите"
+    android:lines="1"
+    android:paddingLeft="10dp"
+    android:paddingTop="5dp"
+    android:paddingRight="10dp"
+    android:paddingBottom="5dp"
+    android:textColor="@color/main_text"
+    android:textColorHint="@color/main_hint_text"
+    android:textSize="18sp"
+    android:focusableInTouchMode="false">
+
+</com.customphase.hdrezkacustom.EditTextWithCorrectNavigation>
