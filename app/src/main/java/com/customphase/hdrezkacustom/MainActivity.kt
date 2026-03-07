@@ -99,6 +99,8 @@ class MainActivity : AppCompatActivity() {
             initializePanels()
             switchToPanel(defaultPanel, false)
         }
+
+        findViewById<TextView>(R.id.versionText).text = "v${BuildConfig.VERSION_NAME}"
     }
 
     override fun onDestroy() {

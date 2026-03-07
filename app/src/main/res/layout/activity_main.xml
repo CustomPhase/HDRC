@@ -28,14 +28,15 @@
 			android:layout_gravity="center"
 			android:background="@color/main_foreground"
 			android:gravity="center"
-			android:orientation="vertical"/>
+			android:orientation="vertical"
+			android:paddingBottom="30dp"/>
 
 		<ImageView
 			android:layout_width="80dp"
 			android:layout_height="80dp"
 			android:layout_alignParentBottom="true"
 			android:layout_gravity="bottom"
-			android:layout_marginBottom="5dp"
+			android:layout_marginBottom="15dp"
 			android:alpha="0.5"
 			android:focusable="false"
 			android:focusableInTouchMode="false"
@@ -43,6 +44,19 @@
 			android:tint="@color/main_text"
 			android:tintMode="src_in"
 			app:srcCompat="@drawable/hdrc_logo_2" />
+
+		<TextView
+			android:id="@+id/versionText"
+			android:layout_width="80dp"
+			android:layout_height="28dp"
+			android:layout_gravity="bottom"
+			android:alpha="0.5"
+			android:focusable="false"
+			android:focusableInTouchMode="false"
+			android:gravity="center"
+			android:text="0.0.0"
+			android:textColor="@color/main_text"
+			android:textSize="16sp" />
 
 	</FrameLayout>
 
