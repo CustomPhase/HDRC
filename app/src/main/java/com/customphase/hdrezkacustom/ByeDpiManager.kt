@@ -20,15 +20,18 @@ import javax.net.ssl.*
 class ByeDpiManager {
     private lateinit var process : Process
 
-    suspend fun start(context: Context) = withContext(Dispatchers.IO) {
+    suspend fun start(context: Context, useSettings : Boolean) = withContext(Dispatchers.IO) {
 
         if (isDomainReachable(context.getString(R.string.site_url))) return@withContext
 
         val nativeDir = context.applicationInfo.nativeLibraryDir
         val binFile = File(nativeDir, "libbyedpi.so")
 
-        val strategy = settings.byeDpiStrategyProp.getValue()
-        val args = "-H:rezka.ag $strategy"
+        var args = ""
+        if (useSettings) {
+            val strategy = settings.byeDpiStrategyProp.getValue()
+            args = "-H:rezka.ag $strategy"
+        }
         val command = arrayOf(binFile.absolutePath, "-i", BYEDPI_PROXY_ADDRESS, "-p", BYEDPI_PROXY_PORT.toString()) +
                 args.split("\\s+".toRegex()).toTypedArray()
 
@@ -36,9 +39,9 @@ class ByeDpiManager {
             .redirectErrorStream(true)
             .start()
 
-        Thread {
+        /*Thread {
             process.inputStream.bufferedReader().forEachLine { Log.e("ByeDpi_Log", it) }
-        }.start()
+        }.start()*/
 
         if (!waitForProxy(BYEDPI_PROXY_PORT, 5000)) {
             throw Exception("Порт $BYEDPI_PROXY_PORT не открылся за 5 секунд")
@@ -67,30 +70,29 @@ class ByeDpiManager {
 
     fun isDomainReachable(domainUrl: String): Boolean {
         return try {
-            val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
-                override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
-                override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
-                override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
-            })
-
-            val sc = SSLContext.getInstance("SSL")
-            sc.init(null, trustAllCerts, SecureRandom())
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.socketFactory)
-
-            HttpsURLConnection.setDefaultHostnameVerifier { _, _ -> true }
+            val sc = SSLContext.getInstance("TLS").apply {
+                init(null, arrayOf(object : X509TrustManager {
+                    override fun checkClientTrusted(p0: Array<out X509Certificate>?, p1: String?) {}
+                    override fun checkServerTrusted(p0: Array<out X509Certificate>?, p1: String?) {}
+                    override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+                }), SecureRandom())
+            }
 
             val url = URL(domainUrl)
-            val connection = url.openConnection() as HttpURLConnection
+            val connection = url.openConnection() as HttpsURLConnection
+
+            connection.sslSocketFactory = sc.socketFactory
+            connection.hostnameVerifier = HostnameVerifier { _, _ -> true }
+
             connection.connectTimeout = 3000
+            connection.readTimeout = 3000
             connection.requestMethod = "HEAD"
 
-            Log.e("ByeDpi_Log", "Domain is reachable without proxy, byedpi disabled")
-            connection.responseCode in 200..299
-        } catch (e: IOException) {
-            Log.e("ByeDpi_Log", e.toString())
-            false
+            val code = connection.responseCode
+            Log.e("ByeDpi_Log", "Check finished: $code")
+            code in 200..299
         } catch (e: Exception) {
-            Log.e("ByeDpi_Log", e.toString())
+            Log.e("ByeDpi_Log", "Domain not reachable: ${e.message}. Starting byeDpi.")
             false
         }
     }

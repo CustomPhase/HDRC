@@ -82,8 +82,12 @@ class MainActivity : AppCompatActivity() {
         })
 
         lifecycleScope.launch {
+            //This is stupid, but ByeDpi wont start, if we call it after we initialize SaveDataManager.
+            //So we start ByeDpi without settings first, stop it, then load settings, and then restart
+            byeDpiManager.start(this@MainActivity, false)
+            byeDpiManager.stop()
             saveDataManager.loadSettings()
-            byeDpiManager.start(this@MainActivity)
+            byeDpiManager.start(this@MainActivity, true)
             withContext(Dispatchers.IO) {
                 hdrezkaApi.warmup()
                 hdrezkaApi.login(
