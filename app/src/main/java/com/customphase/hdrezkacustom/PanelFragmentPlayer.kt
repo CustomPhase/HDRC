@@ -172,11 +172,11 @@ class PanelFragmentPlayer : PanelFragment() {
         } else {
             newPosition.coerceAtLeast(0)
         }
-        playerView.useController = false
         seekCoroutine?.cancel()
+        playerView.useController = false
         player.seekTo(targetPosition)
         seekCoroutine = lifecycleScope.launch {
-            delay(50)
+            delay(200)
             playerView.useController = true
         }
     }
