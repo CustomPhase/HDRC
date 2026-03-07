@@ -59,6 +59,8 @@ class PanelFragmentPlayer : PanelFragment() {
     private lateinit var prevButton : ImageButton
     private lateinit var nextButton : ImageButton
 
+    private var autoSaveJob : Job? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.panel_player, container, false)
         playerView = view.findViewById(R.id.playerView)
@@ -125,6 +127,14 @@ class PanelFragmentPlayer : PanelFragment() {
             (activity as MainActivity).findViewById<View>(R.id.navigationContainer).visibility = View.GONE
             playerView.requestFocus()
         }
+        autoSaveJob = lifecycleScope.launch {
+            while (true) {
+                if (player.isPlaying) {
+                    saveToWatchHistory()
+                }
+                delay(10000)
+            }
+        }
     }
 
     override fun onDisable() {
@@ -132,6 +142,7 @@ class PanelFragmentPlayer : PanelFragment() {
         if (itemId == 0) return
         player.pause()
         saveToWatchHistory()
+        autoSaveJob?.cancel()
     }
 
     fun handleInput(keyCode : Int) : Boolean {
